@@ -1,0 +1,198 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Conteúdo de páginas estáticas ----------
+model PageContent {
+  id        String   @id
+  data      String
+  updatedAt DateTime @updatedAt
+}
+
+model GlobalContent {
+  id        String   @id
+  data      String
+  updatedAt DateTime @updatedAt
+}
+
+// ---------- Coleções dinâmicas ----------
+model Event {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  content     String   @default("")
+  date        DateTime
+  endDate     DateTime?
+  location    String   @default("")
+  image       String   @default("")
+  ctaLabel    String   @default("")
+  ctaHref     String   @default("")
+  featured    Boolean  @default(false)
+  published   Boolean  @default(true)
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  content     String   @default("")
+  category    String   @default("")
+  duration    String   @default("")
+  level       String   @default("Básico")
+  price       String   @default("")
+  instructor  String   @default("")
+  image       String   @default("")
+  ctaLabel    String   @default("")
+  ctaHref     String   @default("")
+  startDate   DateTime?
+  endDate     DateTime?
+  published   Boolean  @default(true)
+  featured    Boolean  @default(false)
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BlogCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String   @default("")
+  content     String   @default("")
+  coverImage  String   @default("")
+  author      String   @default("ACOMAC Joinville")
+  tags        String   @default("")
+  category    String   @default("")
+  readTime    String   @default("")
+  published   Boolean  @default(false)
+  featured    Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ---------- Associados ----------
+model Associate {
+  id                 String   @id @default(cuid())
+  companyName        String
+  cnpj               String?
+  contactName        String
+  phone              String
+  whatsapp           String?
+  email              String
+  city               String?
+  neighborhood       String?
+  address            String?
+  state              String?  @default("SC")
+  zipCode            String?
+  hours              String?
+  products           String?  // tags/produtos separados por vírgula
+  yearsInMarket      Int?
+  coverImage         String?
+  website            String?
+  instagram          String?
+  facebook           String?
+  segment            String?
+  description        String?
+  logoUrl            String?
+  displayName        String?
+  displayDescription String?
+  displayLogo        String?
+  orderIndex         Int      @default(0)
+  status             String   @default("PENDING")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+// ---------- Formulários de contato ----------
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  source    String   @default("contato")
+  read      Boolean  @default(false)
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// ---------- Mídia ----------
+model Media {
+  id         String   @id @default(cuid())
+  filename   String
+  url        String
+  mimeType   String
+  size       Int
+  alt        String   @default("")
+  createdAt  DateTime @default(now())
+}
+
+// ---------- Autenticação ----------
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String   @default("")
+  passwordHash String
+  role         String   @default("editor") // admin | editor
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  lastLoginAt  DateTime?
+}
+
+model Sponsor {
+  id          String    @id @default(cuid())
+  name        String
+  image       String    // 1080x1080 (1:1)
+  url         String    @default("")
+  description String    @default("")
+  active      Boolean   @default(true)
+  weight      Int       @default(5)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ---------- Analytics ----------
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  type      String   // pageview | click | form_submit
+  path      String   @default("")
+  target    String   @default("") // ex: whatsapp, cta_hero, contact_form
+  label     String   @default("")
+  sessionId String   @default("")
+  userAgent String   @default("")
+  referrer  String   @default("")
+  country   String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([type, createdAt])
+  @@index([path, createdAt])
+  @@index([createdAt])
+}

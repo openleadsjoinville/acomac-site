@@ -5,6 +5,7 @@ import Footer from "./Footer";
 import WhatsAppButton from "./WhatsAppButton";
 import MobileBottomNav from "./MobileBottomNav";
 import MobileTopHeader from "./MobileTopHeader";
+import IntroVideo from "./IntroVideo";
 import ExitPopup from "./ExitPopup";
 
 export default async function SiteChrome({
@@ -37,6 +38,7 @@ export default async function SiteChrome({
         <ExitPopup config={exitPopup} pageKey={pageKey} />
       )}
       <MobileBottomNav globalContent={global} />
+      <IntroVideo />
     </>
   );
 }

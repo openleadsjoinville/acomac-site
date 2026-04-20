@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, ArrowRight, Loader2 } from "lucide-react";
+import { Lock, ArrowRight, Loader2 } from "lucide-react";
 
 export function LoginForm() {
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,12 +17,12 @@ export function LoginForm() {
     const res = await fetch("/api/admin/login", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email: email || undefined, password }),
+      body: JSON.stringify({ password }),
     });
     setLoading(false);
     if (!res.ok) {
       const d = await res.json().catch(() => ({}));
-      setError(d.error ?? "Credenciais inválidas");
+      setError(d.error ?? "Senha incorreta");
       return;
     }
     router.push("/admin");
@@ -41,24 +40,13 @@ export function LoginForm() {
       }}
     >
       <div>
-        <label className="admin-label">Email (opcional)</label>
-        <div className="relative">
-          <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: "var(--admin-text-subtle)" }} />
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="admin-input pl-10"
-            placeholder="admin@acomacjoinville.com.br"
-            autoComplete="email"
-          />
-        </div>
-      </div>
-
-      <div>
         <label className="admin-label">Senha</label>
         <div className="relative">
-          <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: "var(--admin-text-subtle)" }} />
+          <Lock
+            size={14}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2"
+            style={{ color: "var(--admin-text-subtle)" }}
+          />
           <input
             type="password"
             value={password}
@@ -89,12 +77,18 @@ export function LoginForm() {
         disabled={loading || !password}
         className="admin-btn admin-btn-primary w-full justify-center py-3"
       >
-        {loading ? <><Loader2 size={15} className="animate-spin" />Entrando...</> : <>Entrar no painel<ArrowRight size={15} /></>}
+        {loading ? (
+          <>
+            <Loader2 size={15} className="animate-spin" />
+            Entrando...
+          </>
+        ) : (
+          <>
+            Entrar no painel
+            <ArrowRight size={15} />
+          </>
+        )}
       </button>
-
-      <p className="text-[11px] text-center mt-2" style={{ color: "var(--admin-text-subtle)" }}>
-        Se você é o superadmin definido no <code style={{ background: "var(--admin-surface-2)", padding: "1px 4px", borderRadius: 4 }}>.env</code>, pode entrar só com a senha.
-      </p>
     </form>
   );
 }

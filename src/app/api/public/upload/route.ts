@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { randomBytes } from "crypto";
 import { prisma } from "@/lib/db";
+import { uploadFile } from "@/lib/storage";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
-const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/svg+xml", "image/gif"];
+const ALLOWED = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/svg+xml",
+  "image/gif",
+];
 const MAX_SIZE = 10 * 1024 * 1024;
 
 export async function POST(req: Request) {
@@ -21,17 +25,26 @@ export async function POST(req: Request) {
     );
   }
   if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: "arquivo muito grande (máx 10MB)" }, { status: 400 });
+    return NextResponse.json(
+      { error: "arquivo muito grande (máx 10MB)" },
+      { status: 400 }
+    );
   }
 
-  await mkdir(UPLOAD_DIR, { recursive: true });
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
-  const filename = `${Date.now()}-${randomBytes(6).toString("hex")}.${ext}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(UPLOAD_DIR, filename), buffer);
-  const url = `/uploads/${filename}`;
-  await prisma.media.create({
-    data: { filename, url, mimeType: file.type, size: file.size },
-  });
-  return NextResponse.json({ url, filename });
+  try {
+    const uploaded = await uploadFile(file);
+    await prisma.media.create({
+      data: {
+        filename: uploaded.filename,
+        url: uploaded.url,
+        mimeType: uploaded.mimeType,
+        size: uploaded.size,
+      },
+    });
+    return NextResponse.json({ url: uploaded.url, filename: uploaded.filename });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "erro no upload";
+    console.error("[public/upload]", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }

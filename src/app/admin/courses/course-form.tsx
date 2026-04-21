@@ -200,7 +200,7 @@ export function CourseForm({ id }: { id?: string }) {
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="admin-label">Categoria</label>
-                <input className="admin-input" value={data.category} onChange={(e) => set("category")(e.target.value)} placeholder="Vendas, Gestão..." />
+                <CategoryField value={data.category} onChange={set("category")} />
               </div>
               <div>
                 <label className="admin-label">Duração</label>
@@ -411,3 +411,74 @@ export function CourseForm({ id }: { id?: string }) {
   );
 }
 
+/**
+ * Campo de categoria: input livre + chips das categorias já em uso.
+ * Permite escolher uma existente ou digitar uma nova, tudo no mesmo campo.
+ */
+function CategoryField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [existing, setExisting] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/admin/courses")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((items: { category?: string }[]) => {
+        const set = new Set<string>();
+        items.forEach((i) => {
+          const c = (i.category ?? "").trim();
+          if (c) set.add(c);
+        });
+        setExisting(Array.from(set).sort((a, b) => a.localeCompare(b)));
+      })
+      .catch(() => {});
+  }, []);
+
+  return (
+    <div className="space-y-2">
+      <input
+        className="admin-input"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Ex: Vendas, Gestão, Técnico..."
+        list="course-categories"
+      />
+      <datalist id="course-categories">
+        {existing.map((c) => (
+          <option key={c} value={c} />
+        ))}
+      </datalist>
+      {existing.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {existing.map((c) => {
+            const active = value.trim().toLowerCase() === c.toLowerCase();
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => onChange(c)}
+                className="text-[11px] font-semibold px-2.5 py-1 rounded-md transition-colors"
+                style={{
+                  background: active
+                    ? "var(--admin-accent-soft)"
+                    : "var(--admin-surface-2)",
+                  color: active ? "var(--admin-accent)" : "var(--admin-text-muted)",
+                  border: `1px solid ${active ? "rgba(246,129,30,0.35)" : "var(--admin-border)"}`,
+                }}
+              >
+                {c}
+              </button>
+            );
+          })}
+        </div>
+      )}
+      <p className="text-[11px]" style={{ color: "var(--admin-text-muted)" }}>
+        Clique num chip pra reutilizar ou digite uma nova categoria — ela vai aparecer como filtro na página pública.
+      </p>
+    </div>
+  );
+}

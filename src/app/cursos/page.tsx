@@ -24,16 +24,38 @@ import {
 import ClientSiteChrome from "@/components/ClientSiteChrome";
 import SponsorAside from "@/components/public/SponsorAside";
 import { usePageContent } from "@/hooks/usePageContent";
+import { useCollection } from "@/hooks/useCollection";
 import { useInView, fadeIn, staggerStyle } from "@/hooks/useAnimations";
+import { whatsappLink } from "@/lib/utils";
 
-type Categoria = "todos" | "tecnico" | "gestao" | "vendas" | "seguranca";
+type DBCourse = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  duration: string;
+  level: string;
+  price: string;
+  image: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+};
+
+const COURSE_ICONS = [Paintbrush, Wrench, Zap, HardHat, ShoppingCart, UserCog, Forklift, GraduationCap];
+
+function autoCourseMessage(title: string): string {
+  return `Olá! Tenho interesse no curso "${title}" da ACOMAC. Gostaria de receber mais informações sobre datas, valores e como me inscrever.`;
+}
+
+type Categoria = string;
 
 type Curso = {
   icon: typeof Paintbrush;
   title: string;
   description: string;
   duration: string;
-  category: Exclude<Categoria, "todos">;
+  category: string;
   level: "Básico" | "Intermediário" | "Avançado";
   image: string;
   turma?: string;
@@ -191,6 +213,7 @@ const info = [
 export default function CursosPage() {
   const page = usePageContent("cursos");
   const hero = page?.hero;
+  const dbCourses = useCollection<DBCourse>("/api/public/courses");
   const [categoria, setCategoria] = useState<Categoria>("todos");
   const [busca, setBusca] = useState("");
 
@@ -198,8 +221,37 @@ export default function CursosPage() {
   const { ref: gridRef, inView: gridInView } = useInView(0.05);
   const { ref: infoRef, inView: infoInView } = useInView(0.15);
 
+  // Fonte: DB quando há cursos publicados, fallback pros hardcoded (para dev sem seed)
+  const cursosSrc: (Curso & { ctaMessage?: string; ctaWhatsapp?: string })[] =
+    dbCourses && dbCourses.length > 0
+      ? dbCourses.map((c, i) => ({
+          icon: COURSE_ICONS[i % COURSE_ICONS.length] as typeof Paintbrush,
+          title: c.title,
+          description: c.description,
+          duration: c.duration || "—",
+          category: c.category || "Geral",
+          level:
+            c.level === "Intermediário" || c.level === "Avançado"
+              ? (c.level as Curso["level"])
+              : "Básico",
+          image: c.image,
+          turma: c.price || undefined,
+          ctaMessage: c.ctaLabel || autoCourseMessage(c.title),
+          ctaWhatsapp: c.ctaHref || "",
+        }))
+      : cursos;
+
+  // Categorias dinâmicas: geradas das categorias reais dos cursos + "Todos"
+  const filtrosDinamicos: { key: Categoria; label: string }[] = [
+    { key: "todos", label: "Todos" },
+    ...Array.from(new Set(cursosSrc.map((c) => c.category)))
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .map((c) => ({ key: c, label: c })),
+  ];
+
   const lista = useMemo(() => {
-    return cursos.filter((c) => {
+    return cursosSrc.filter((c) => {
       const matchCat = categoria === "todos" || c.category === categoria;
       const termo = busca.trim().toLowerCase();
       const matchBusca =
@@ -208,7 +260,7 @@ export default function CursosPage() {
         c.description.toLowerCase().includes(termo);
       return matchCat && matchBusca;
     });
-  }, [categoria, busca]);
+  }, [categoria, busca, cursosSrc]);
 
   return (
     <>
@@ -333,7 +385,7 @@ export default function CursosPage() {
               </span>
             </div>
             <div className="flex flex-wrap gap-2 mb-10">
-              {filtros.map((f) => {
+              {filtrosDinamicos.map((f) => {
                 const ativa = f.key === categoria;
                 return (
                   <button
@@ -430,7 +482,19 @@ export default function CursosPage() {
                       )}
 
                       <a
-                        href="/#contato"
+                        href={(() => {
+                          const withCta = c as typeof c & { ctaWhatsapp?: string; ctaMessage?: string };
+                          if (withCta.ctaMessage) {
+                            const num = withCta.ctaWhatsapp?.replace(/\D/g, "");
+                            if (num) return whatsappLink(num, withCta.ctaMessage);
+                            return whatsappLink("5547991103681", withCta.ctaMessage);
+                          }
+                          return "/#contato";
+                        })()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-track="cursos_whatsapp_click"
+                        data-track-label={c.title}
                         className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-300"
                         style={{
                           backgroundColor: "#0059AB",

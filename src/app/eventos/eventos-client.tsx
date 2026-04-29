@@ -358,11 +358,15 @@ export function EventosClient({
                             }
                             target={e.ctaHref ? "_self" : "_blank"}
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-[13px] font-bold self-start"
-                            style={{ color: "#F6811E" }}
+                            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-[13px] font-bold self-stretch transition-all duration-300 hover:brightness-110"
+                            style={{
+                              backgroundColor: "#F6811E",
+                              color: "#fff",
+                              boxShadow: "0 4px 16px rgba(246,129,30,0.28)",
+                            }}
                           >
                             {e.ctaLabel || "Quero participar"}
-                            <ArrowRight size={13} />
+                            <ArrowRight size={14} />
                           </a>
                         </div>
                       </article>

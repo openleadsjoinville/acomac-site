@@ -159,27 +159,25 @@ export function EventosClient({
             <div className="max-w-7xl mx-auto px-6">
               <div
                 ref={featRef}
-                className="rounded-3xl overflow-hidden grid lg:grid-cols-2"
+                className="rounded-3xl overflow-hidden grid lg:grid-cols-2 items-start"
                 style={{
                   ...fadeIn(featInView),
                   background:
                     "linear-gradient(135deg, #002952 0%, #0059AB 100%)",
                 }}
               >
-                <div className="relative aspect-video lg:aspect-auto lg:min-h-[520px]">
-                  <Image
+                <div className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={featuredEvent.image || FALLBACK_IMG}
                     alt={featuredEvent.title}
-                    fill
-                    sizes="(min-width: 1024px) 50vw, 100vw"
-                    className="object-cover"
-                    unoptimized
+                    className="block w-full h-auto"
                   />
                   <div
-                    className="absolute inset-0"
+                    className="absolute inset-0 pointer-events-none"
                     style={{
                       background:
-                        "linear-gradient(135deg, rgba(0,41,82,0.55) 0%, rgba(0,41,82,0.15) 100%)",
+                        "linear-gradient(135deg, rgba(0,41,82,0.25) 0%, rgba(0,41,82,0) 60%)",
                     }}
                   />
                 </div>

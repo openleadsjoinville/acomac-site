@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { z, ZodTypeAny } from "zod";
 import {
   ChevronDown,
   ChevronRight,
+  ExternalLink,
   MessageCircle,
   Phone,
   Plus,
@@ -13,6 +15,102 @@ import {
 } from "lucide-react";
 import { LargeImageField } from "@/components/ui/LargeImageField";
 import { resolveFieldPreset } from "@/lib/image-presets";
+
+/**
+ * Seções cujo conteúdo é gerenciado em outra aba do painel
+ * (Eventos / Cursos / Blog). No editor de página, essas seções
+ * exibem só um botão de atalho em vez de um editor duplicado.
+ *
+ * A chave é o caminho completo dentro do schema, no formato
+ * `<pageKey>.<section>[.<field>]`.
+ */
+const MANAGED_SECTIONS: Record<
+  string,
+  { url: string; label: string; description: string }
+> = {
+  "home.events.items": {
+    url: "/admin/events",
+    label: "Gerenciar eventos",
+    description:
+      "Os eventos exibidos nessa seção da Home vêm da aba Eventos do painel. Para adicionar, editar ou remover eventos, abra a página de eventos.",
+  },
+  "home.courses.items": {
+    url: "/admin/courses",
+    label: "Gerenciar cursos",
+    description:
+      "Os cursos exibidos nessa seção da Home vêm da aba Cursos do painel. Para adicionar, editar ou remover cursos, abra a página de cursos.",
+  },
+  "home.news.items": {
+    url: "/admin/blog",
+    label: "Gerenciar posts do blog",
+    description:
+      "As notícias exibidas nessa seção da Home vêm da aba Blog do painel. Para adicionar, editar ou remover posts, abra a página de blog.",
+  },
+  "eventos.featured": {
+    url: "/admin/events",
+    label: "Gerenciar eventos",
+    description:
+      "O evento em destaque é definido na aba Eventos do painel. Para gerenciar, abra a página de eventos.",
+  },
+  "eventos.upcoming": {
+    url: "/admin/events",
+    label: "Gerenciar eventos",
+    description:
+      "Os próximos eventos são gerenciados na aba Eventos do painel. Para adicionar ou editar, abra a página de eventos.",
+  },
+  "eventos.past": {
+    url: "/admin/events",
+    label: "Gerenciar eventos",
+    description:
+      "Os eventos anteriores são gerenciados na aba Eventos do painel. Para adicionar ou editar, abra a página de eventos.",
+  },
+  "cursos.upcoming": {
+    url: "/admin/courses",
+    label: "Gerenciar cursos",
+    description:
+      "Os próximos cursos são gerenciados na aba Cursos do painel. Para adicionar ou editar, abra a página de cursos.",
+  },
+  "cursos.catalog": {
+    url: "/admin/courses",
+    label: "Gerenciar cursos",
+    description:
+      "O catálogo de cursos é gerenciado na aba Cursos do painel. Para adicionar ou editar, abra a página de cursos.",
+  },
+};
+
+function ManagedSectionCta({
+  url,
+  label,
+  description,
+}: {
+  url: string;
+  label: string;
+  description: string;
+}) {
+  return (
+    <div
+      className="rounded-xl p-5"
+      style={{
+        background: "var(--admin-accent-soft)",
+        border: "1px dashed var(--admin-accent)",
+      }}
+    >
+      <p
+        className="text-sm leading-relaxed mb-4"
+        style={{ color: "var(--admin-text-strong)" }}
+      >
+        {description}
+      </p>
+      <Link
+        href={url}
+        className="admin-btn admin-btn-primary inline-flex items-center gap-2"
+      >
+        <ExternalLink size={14} />
+        {label}
+      </Link>
+    </div>
+  );
+}
 
 function isWhatsAppCtaSchema(schema: ZodTypeAny): boolean {
   const inner = unwrap(schema);
@@ -493,11 +591,13 @@ function ObjectField({
   value,
   onChange,
   depth = 0,
+  path = [],
 }: {
   schema: z.ZodObject<z.ZodRawShape>;
   value: Record<string, unknown>;
   onChange: (v: Record<string, unknown>) => void;
   depth?: number;
+  path?: string[];
 }) {
   const shape = schema.shape;
   // No depth 0 cada entrada vira uma SEÇÃO independente, em bloco próprio,
@@ -577,6 +677,7 @@ function ObjectField({
               value={(value ?? {})[key]}
               onChange={(v) => onChange({ ...(value ?? {}), [key]: v })}
               depth={depth}
+              path={[...path, key]}
             />
           </section>
         ))}
@@ -594,25 +695,51 @@ function ObjectField({
           value={(value ?? {})[key]}
           onChange={(v) => onChange({ ...(value ?? {}), [key]: v })}
           depth={depth}
+          path={[...path, key]}
         />
       ))}
     </div>
   );
 }
 
-function FieldBlock({ name, schema, value, onChange, depth }: { name: string; schema: ZodTypeAny; value: unknown; onChange: (v: unknown) => void; depth: number }) {
+function FieldBlock({ name, schema, value, onChange, depth, path = [] }: { name: string; schema: ZodTypeAny; value: unknown; onChange: (v: unknown) => void; depth: number; path?: string[] }) {
   const inner = unwrap(schema);
   const isArray = inner instanceof z.ZodArray;
   const isObject = inner instanceof z.ZodObject;
   const isWaCta = isWhatsAppCtaSchema(inner);
   const [open, setOpen] = useState(depth < 1);
 
+  // Seções gerenciadas em outras abas (Eventos / Cursos / Blog):
+  // substitui o editor por um botão de atalho.
+  const managed = MANAGED_SECTIONS[path.join(".")];
+  if (managed) {
+    if (depth === 0) {
+      return (
+        <div
+          className="rounded-xl px-4 py-4"
+          style={{
+            background: "var(--admin-surface)",
+            border: "1px solid var(--admin-border)",
+          }}
+        >
+          <ManagedSectionCta {...managed} />
+        </div>
+      );
+    }
+    return (
+      <div>
+        <label className="admin-label">{humanize(name)}</label>
+        <ManagedSectionCta {...managed} />
+      </div>
+    );
+  }
+
   // WhatsApp CTA: rendering próprio, sem o "collapse" genérico de objeto
   if (isWaCta) {
     return (
       <div>
         <label className="admin-label">{humanize(name)}</label>
-        <FieldRenderer schema={schema} value={value} onChange={onChange} name={name} depth={depth + 1} />
+        <FieldRenderer schema={schema} value={value} onChange={onChange} name={name} depth={depth + 1} path={path} />
       </div>
     );
   }
@@ -629,7 +756,7 @@ function FieldBlock({ name, schema, value, onChange, depth }: { name: string; sc
             border: "1px solid var(--admin-border)",
           }}
         >
-          <FieldRenderer schema={schema} value={value} onChange={onChange} name={name} depth={depth + 1} />
+          <FieldRenderer schema={schema} value={value} onChange={onChange} name={name} depth={depth + 1} path={path} />
         </div>
       );
     }
@@ -648,12 +775,14 @@ function FieldBlock({ name, schema, value, onChange, depth }: { name: string; sc
         </button>
         {open && (
           <div className="px-4 pb-4">
-            <FieldRenderer schema={schema} value={value} onChange={onChange} name={name} depth={depth + 1} />
+            <FieldRenderer schema={schema} value={value} onChange={onChange} name={name} depth={depth + 1} path={path} />
           </div>
         )}
       </div>
     );
   }
+
+
 
   const isImage = looksLikeImage(name);
 
@@ -663,7 +792,7 @@ function FieldBlock({ name, schema, value, onChange, depth }: { name: string; sc
         <label className="admin-label flex items-center justify-between">
           <span>{humanize(name)}</span>
         </label>
-        <FieldRenderer schema={schema} value={value} onChange={onChange} name={name} depth={depth + 1} />
+        <FieldRenderer schema={schema} value={value} onChange={onChange} name={name} depth={depth + 1} path={path} />
       </div>
     );
   }
@@ -672,13 +801,13 @@ function FieldBlock({ name, schema, value, onChange, depth }: { name: string; sc
     <div className="flex items-start justify-between gap-4">
       <div className="flex-1 min-w-0">
         <label className="admin-label">{humanize(name)}</label>
-        <FieldRenderer schema={schema} value={value} onChange={onChange} name={name} depth={depth + 1} />
+        <FieldRenderer schema={schema} value={value} onChange={onChange} name={name} depth={depth + 1} path={path} />
       </div>
     </div>
   );
 }
 
-function FieldRenderer({ schema, value, onChange, name, depth = 0 }: { schema: ZodTypeAny; value: unknown; onChange: (v: unknown) => void; name?: string; depth?: number }) {
+function FieldRenderer({ schema, value, onChange, name, depth = 0, path = [] }: { schema: ZodTypeAny; value: unknown; onChange: (v: unknown) => void; name?: string; depth?: number; path?: string[] }) {
   const inner = unwrap(schema);
   if (isWhatsAppCtaSchema(inner)) {
     return (
@@ -702,7 +831,7 @@ function FieldRenderer({ schema, value, onChange, name, depth = 0 }: { schema: Z
     return <ArrayField schema={inner as z.ZodArray<ZodTypeAny>} value={(value as unknown[]) ?? []} onChange={onChange as (v: unknown[]) => void} name={name} />;
   }
   if (inner instanceof z.ZodObject) {
-    return <ObjectField schema={inner as z.ZodObject<z.ZodRawShape>} value={(value as Record<string, unknown>) ?? {}} onChange={onChange as (v: Record<string, unknown>) => void} depth={depth} />;
+    return <ObjectField schema={inner as z.ZodObject<z.ZodRawShape>} value={(value as Record<string, unknown>) ?? {}} onChange={onChange as (v: Record<string, unknown>) => void} depth={depth} path={path} />;
   }
   return <p className="text-xs text-red-400">Tipo não suportado</p>;
 }
@@ -769,10 +898,12 @@ export function SchemaEditor<T extends z.ZodObject<z.ZodRawShape>>({
   schema,
   value,
   onChange,
+  pageKey,
 }: {
   schema: T;
   value: z.infer<T>;
   onChange: (v: z.infer<T>) => void;
+  pageKey?: string;
 }) {
   const sectionKeys = Object.keys(schema.shape);
   return (
@@ -783,6 +914,7 @@ export function SchemaEditor<T extends z.ZodObject<z.ZodRawShape>>({
         value={value as Record<string, unknown>}
         onChange={(v) => onChange(v as z.infer<T>)}
         depth={0}
+        path={pageKey ? [pageKey] : []}
       />
     </>
   );

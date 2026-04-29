@@ -192,15 +192,31 @@ export function EventsListClient() {
                 className="rounded-2xl overflow-hidden admin-hover-ring"
                 style={{ background: "var(--admin-surface)", border: "1px solid var(--admin-border)" }}
               >
-                <div
-                  className="h-36 relative"
-                  style={{
-                    background: e.image
-                      ? `url(${e.image}) center/cover`
-                      : "linear-gradient(135deg, #0059AB 0%, #003d7a 100%)",
-                  }}
-                >
-                  <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.6), transparent 60%)" }} />
+                <div className="relative">
+                  {e.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={e.image}
+                      alt={e.title}
+                      className="block w-full h-auto"
+                      style={{ background: "var(--admin-surface-2)" }}
+                    />
+                  ) : (
+                    <div
+                      className="w-full aspect-video"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #0059AB 0%, #003d7a 100%)",
+                      }}
+                    />
+                  )}
+                  <div
+                    className="absolute inset-x-0 top-0 h-20 pointer-events-none"
+                    style={{
+                      background:
+                        "linear-gradient(to bottom, rgba(0,0,0,0.55), transparent)",
+                    }}
+                  />
                   <div className="absolute top-3 left-3 flex gap-2 flex-wrap">
                     {e.featured && !expired && e.published && (
                       <span className="admin-badge" style={{ color: "#fbbf24", background: "rgba(245,158,11,0.15)" }}>

@@ -1,19 +1,26 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const url = new URL(req.url);
+  const all = url.searchParams.get("all") === "1";
+
   const now = new Date();
   const items = await prisma.event.findMany({
     where: {
       published: true,
-      OR: [
-        // Com data de término: só mostra se ainda não terminou
-        { endDate: { gte: now } },
-        // Sem data de término: só mostra se a data do evento ainda não passou
-        { AND: [{ endDate: null }, { date: { gte: now } }] },
-      ],
+      ...(all
+        ? {}
+        : {
+            OR: [
+              { endDate: { gte: now } },
+              { AND: [{ endDate: null }, { date: { gte: now } }] },
+            ],
+          }),
     },
-    orderBy: [{ featured: "desc" }, { date: "asc" }],
+    orderBy: all
+      ? [{ featured: "desc" }, { date: "desc" }]
+      : [{ featured: "desc" }, { date: "asc" }],
   });
   return NextResponse.json(items, { headers: { "cache-control": "no-store" } });
 }

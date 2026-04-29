@@ -126,6 +126,7 @@ export function PageContentEditor<K extends PageKey>({
                 setValue(v as PageContentMap[K]);
                 setDirty(true);
               }}
+              pageKey={pageKey}
             />
           </Panel>
         ) : (

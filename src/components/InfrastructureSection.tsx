@@ -106,7 +106,7 @@ export default function InfrastructureSection({
           description: f.description,
           features: [] as string[],
           gradient: gradientCycle[i % gradientCycle.length],
-          image: data.image || "",
+          image: f.image || data.image || spaces[i % spaces.length].image,
         }))
       : spaces;
 

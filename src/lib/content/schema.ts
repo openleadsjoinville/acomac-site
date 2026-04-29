@@ -243,6 +243,7 @@ export const HomeSchema = z.object({
       z.object({
         title: z.string(),
         description: z.string(),
+        image: z.string().default(""),
       })
     ),
   }),

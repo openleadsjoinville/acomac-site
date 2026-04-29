@@ -269,10 +269,10 @@ export const defaultHome: HomeContent = {
     ],
     image: "/Fachada acomac.png",
     features: [
-      { title: "Auditório", description: "Espaço para palestras e eventos." },
-      { title: "Salas de treinamento", description: "Estrutura pra cursos presenciais." },
-      { title: "Coworking", description: "Ambiente de trabalho compartilhado." },
-      { title: "Estacionamento", description: "Amplo estacionamento próprio." },
+      { title: "Auditório", description: "Espaço para palestras e eventos.", image: "" },
+      { title: "Salas de treinamento", description: "Estrutura pra cursos presenciais.", image: "" },
+      { title: "Coworking", description: "Ambiente de trabalho compartilhado.", image: "" },
+      { title: "Estacionamento", description: "Amplo estacionamento próprio.", image: "" },
     ],
   },
   courses: {

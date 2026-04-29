@@ -529,54 +529,6 @@ export default function ConectaAssociadosPage() {
               </div>
             )}
 
-            {/* CTA block */}
-            <div
-              className="mt-20 rounded-2xl p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden"
-              style={{
-                background:
-                  "linear-gradient(135deg, #0059AB 0%, #0068c7 100%)",
-              }}
-            >
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-                  backgroundSize: "48px 48px",
-                }}
-              />
-              <div className="relative z-10 flex items-center gap-4">
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: "rgba(246,129,30,0.2)" }}
-                >
-                  <Sparkles size={24} strokeWidth={1.7} style={{ color: "#F6811E" }} />
-                </div>
-                <div>
-                  <h4 className="text-lg md:text-xl font-bold text-white mb-1">
-                    Sua empresa também pode fazer parte
-                  </h4>
-                  <p
-                    className="text-sm"
-                    style={{ color: "rgba(255,255,255,0.65)" }}
-                  >
-                    Associe-se e apareça aqui para toda a rede ACOMAC.
-                  </p>
-                </div>
-              </div>
-              <a
-                href="/#associe-se"
-                className="relative z-10 inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl text-sm font-bold transition-all duration-300 hover:-translate-y-0.5 shrink-0"
-                style={{
-                  backgroundColor: "#F6811E",
-                  color: "#ffffff",
-                  boxShadow: "0 4px 24px rgba(246,129,30,0.3)",
-                }}
-              >
-                Quero me associar
-                <ArrowRight size={15} />
-              </a>
-            </div>
             </div>
             <SponsorAside slot="conecta-associados" />
           </div>

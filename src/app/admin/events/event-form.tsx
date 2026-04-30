@@ -21,6 +21,9 @@ type EventData = {
   image: string;
   ctaLabel: string;
   ctaHref: string;
+  ctaType: string;
+  ctaWhatsappNumber: string;
+  ctaWhatsappMessage: string;
   featured: boolean;
   published: boolean;
   orderIndex: number;
@@ -36,6 +39,9 @@ const empty: EventData = {
   image: "",
   ctaLabel: "",
   ctaHref: "",
+  ctaType: "link",
+  ctaWhatsappNumber: "",
+  ctaWhatsappMessage: "",
   featured: false,
   published: true,
   orderIndex: 0,
@@ -207,10 +213,60 @@ export function EventForm({ id }: { id?: string }) {
                 <input className="admin-input" value={data.ctaLabel} onChange={(e) => set("ctaLabel")(e.target.value)} placeholder="Ex: Inscrever-se" />
               </div>
               <div>
-                <label className="admin-label">Link do botão</label>
-                <input className="admin-input" value={data.ctaHref} onChange={(e) => set("ctaHref")(e.target.value)} placeholder="https://..." />
+                <label className="admin-label">Tipo de ação</label>
+                <select 
+                  className="admin-input" 
+                  value={data.ctaType} 
+                  onChange={(e) => set("ctaType")(e.target.value)}
+                >
+                  <option value="link">Link externo</option>
+                  <option value="whatsapp">WhatsApp</option>
+                </select>
               </div>
             </div>
+
+            {data.ctaType === "link" ? (
+              <div className="mt-4">
+                <label className="admin-label">URL do link</label>
+                <input 
+                  className="admin-input" 
+                  value={data.ctaHref} 
+                  onChange={(e) => set("ctaHref")(e.target.value)} 
+                  placeholder="https://..." 
+                />
+                <p className="text-[11px] mt-1.5" style={{ color: "var(--admin-text-muted)" }}>
+                  O link será aberto em uma nova aba quando clicarem no botão.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-4 space-y-3">
+                <div>
+                  <label className="admin-label">Número do WhatsApp</label>
+                  <input 
+                    className="admin-input" 
+                    value={data.ctaWhatsappNumber} 
+                    onChange={(e) => set("ctaWhatsappNumber")(e.target.value)} 
+                    placeholder="5547991103681"
+                  />
+                  <p className="text-[11px] mt-1.5" style={{ color: "var(--admin-text-muted)" }}>
+                    Incluir código do país (55 para Brasil) + DDD + número
+                  </p>
+                </div>
+                <div>
+                  <label className="admin-label">Mensagem padrão</label>
+                  <textarea 
+                    className="admin-input admin-textarea" 
+                    value={data.ctaWhatsappMessage} 
+                    onChange={(e) => set("ctaWhatsappMessage")(e.target.value)} 
+                    placeholder="Ex: Olá! Tenho interesse em participar deste evento."
+                    rows={3}
+                  />
+                  <p className="text-[11px] mt-1.5" style={{ color: "var(--admin-text-muted)" }}>
+                    Esta será a mensagem enviada quando a pessoa clica no botão.
+                  </p>
+                </div>
+              </div>
+            )}
           </Panel>
         </div>
 

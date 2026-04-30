@@ -9,7 +9,7 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
   const { id } = await ctx.params;
   const body = await req.json();
   const data: Record<string, unknown> = {};
-  const keys = ["title", "description", "content", "location", "image", "ctaLabel", "ctaHref"] as const;
+  const keys = ["title", "description", "content", "location", "image", "ctaLabel", "ctaHref", "ctaType", "ctaWhatsappNumber", "ctaWhatsappMessage"] as const;
   for (const k of keys) if (k in body) data[k] = body[k] ?? "";
   if ("slug" in body && body.slug) data.slug = slugify(body.slug);
   if ("featured" in body) data.featured = !!body.featured;

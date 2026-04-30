@@ -11,8 +11,10 @@ import {
   Trophy,
   Rocket,
   Clock,
+  MessageCircle,
 } from "lucide-react";
 import { useInView, fadeIn, staggerStyle } from "@/hooks/useAnimations";
+import { whatsappLink } from "@/lib/utils";
 
 const events = [
   {
@@ -93,7 +95,11 @@ type DBEvent = {
   date: string;
   location: string;
   image: string;
+  ctaLabel: string;
   ctaHref: string;
+  ctaType: string;
+  ctaWhatsappNumber: string;
+  ctaWhatsappMessage: string;
   featured: boolean;
 };
 
@@ -101,6 +107,28 @@ const eventIconCycle = [Star, Handshake, Rocket, Users, Trophy, Clock];
 
 const FALLBACK_EVENT_IMAGE =
   "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=800&fit=crop&q=80&auto=format";
+
+const WHATSAPP_NUMBER = "5547991103681";
+
+function buildEventCta(item: {
+  title: string;
+  ctaType?: string;
+  ctaHref?: string;
+  ctaWhatsappNumber?: string;
+  ctaWhatsappMessage?: string;
+}): { href: string; external: boolean } {
+  if (item.ctaType === "whatsapp") {
+    const number = item.ctaWhatsappNumber || WHATSAPP_NUMBER;
+    const message =
+      item.ctaWhatsappMessage || `Olá! Tenho interesse no evento "${item.title}".`;
+    return { href: whatsappLink(number, message), external: true };
+  }
+  if (item.ctaHref) return { href: item.ctaHref, external: false };
+  return {
+    href: whatsappLink(WHATSAPP_NUMBER, `Olá! Tenho interesse no evento "${item.title}".`),
+    external: true,
+  };
+}
 
 export default function EventsSection({
   data,
@@ -115,20 +143,30 @@ export default function EventsSection({
 
   const list =
     dbEvents && dbEvents.length > 0
-      ? dbEvents.map((item, i) => ({
-          icon: eventIconCycle[i % eventIconCycle.length],
-          title: item.title,
-          subtitle: item.location,
-          description: item.description,
-          date: new Date(item.date).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" }),
-          location: item.location,
-          tags: [] as string[],
-          accent: item.featured ? "#F6811E" : i % 2 === 0 ? "#F6811E" : "#0059AB",
-          featured: item.featured || i === 0,
-          image: item.image,
-          href: item.ctaHref || `/eventos`,
-        }))
-      : events.map((e) => ({ ...e, href: "" }));
+      ? dbEvents.map((item, i) => {
+          const cta = buildEventCta(item);
+          return {
+            icon: eventIconCycle[i % eventIconCycle.length],
+            title: item.title,
+            subtitle: item.location,
+            description: item.description,
+            date: new Date(item.date).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" }),
+            location: item.location,
+            tags: [] as string[],
+            accent: item.featured ? "#F6811E" : i % 2 === 0 ? "#F6811E" : "#0059AB",
+            featured: item.featured || i === 0,
+            image: item.image,
+            ctaLabel: item.ctaLabel || "",
+            ctaHref: cta.href,
+            ctaExternal: cta.external,
+          };
+        })
+      : events.map((e) => ({
+          ...e,
+          ctaLabel: "",
+          ctaHref: whatsappLink(WHATSAPP_NUMBER, `Olá! Tenho interesse no evento "${e.title}".`),
+          ctaExternal: true,
+        }));
 
   const featured = list[0];
   const FeaturedIcon = featured.icon;
@@ -212,17 +250,21 @@ export default function EventsSection({
                   <Calendar size={15} style={{ color: "#F6811E" }} />
                   {featured.date}
                 </span>
-                <span
-                  className="flex items-center gap-2 text-sm"
-                  style={{ color: "rgba(255,255,255,0.7)" }}
-                >
-                  <MapPin size={15} style={{ color: "#F6811E" }} />
-                  {featured.location}
-                </span>
+                {featured.location && (
+                  <span
+                    className="flex items-center gap-2 text-sm"
+                    style={{ color: "rgba(255,255,255,0.7)" }}
+                  >
+                    <MapPin size={15} style={{ color: "#F6811E" }} />
+                    {featured.location}
+                  </span>
+                )}
               </div>
 
               <a
-                href={data?.ctaHref ?? (featured as { href?: string }).href ?? "/eventos"}
+                href={data?.ctaHref ?? (featured as { ctaHref?: string }).ctaHref ?? "/eventos"}
+                target={(featured as { ctaExternal?: boolean }).ctaExternal ? "_blank" : undefined}
+                rel={(featured as { ctaExternal?: boolean }).ctaExternal ? "noopener noreferrer" : undefined}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white self-start transition-all duration-300 hover:-translate-y-0.5 group/btn"
                 style={{
                   backgroundColor: "#F6811E",
@@ -237,7 +279,8 @@ export default function EventsSection({
                     "0 4px 20px rgba(246,129,30,0.3)";
                 }}
               >
-                {data?.ctaLabel ?? "Saiba mais"}
+                <MessageCircle size={15} />
+                {data?.ctaLabel ?? (featured as { ctaLabel?: string }).ctaLabel ?? "Quero participar"}
                 <ArrowRight
                   size={15}
                   className="transition-transform group-hover/btn:translate-x-1"
@@ -288,10 +331,15 @@ export default function EventsSection({
         >
           {rest.map((event, index) => {
             const Icon = event.icon;
+            const ctaHref =
+              (event as { ctaHref?: string }).ctaHref ||
+              whatsappLink(WHATSAPP_NUMBER, `Olá! Tenho interesse no evento "${event.title}".`);
+            const ctaExternal = (event as { ctaExternal?: boolean }).ctaExternal ?? true;
+            const ctaLabel = (event as { ctaLabel?: string }).ctaLabel || "Quero participar";
             return (
               <div
                 key={event.title}
-                className="group bg-white rounded-2xl border overflow-hidden transition-all duration-300"
+                className="group bg-white rounded-2xl border overflow-hidden transition-all duration-300 flex flex-col h-full"
                 style={{
                   borderColor: "#e5e5e5",
                   ...staggerStyle(gridInView, index, 0.08),
@@ -307,12 +355,12 @@ export default function EventsSection({
                 }}
               >
                 {/* Card header with image */}
-                <div className="h-36 relative overflow-hidden">
+                <div className="relative overflow-hidden bg-gray-100 aspect-[4/3]">
                   <Image
                     src={event.image || FALLBACK_EVENT_IMAGE}
                     alt={event.title}
                     fill
-                    sizes="300px"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                     unoptimized
                   />
@@ -347,51 +395,46 @@ export default function EventsSection({
                 </div>
 
                 {/* Card body */}
-                <div className="p-5">
+                <div className="p-5 flex flex-col flex-1">
                   <h3
-                    className="text-[15px] font-bold mb-1"
+                    className="text-[15px] font-bold mb-2"
                     style={{ color: "#111111" }}
                   >
                     {event.title}
                   </h3>
+                  {event.location && (
+                    <div className="flex items-center gap-1.5 mb-3">
+                      <MapPin size={12} style={{ color: event.accent }} />
+                      <span
+                        className="text-xs font-medium"
+                        style={{ color: "#666666" }}
+                      >
+                        {event.location}
+                      </span>
+                    </div>
+                  )}
                   <p
-                    className="text-xs font-medium mb-3"
-                    style={{ color: "#aaaaaa" }}
-                  >
-                    {event.subtitle}
-                  </p>
-                  <p
-                    className="text-sm leading-relaxed mb-4"
+                    className="text-sm leading-relaxed mb-5 flex-1"
                     style={{ color: "#777777" }}
                   >
                     {event.description}
                   </p>
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {event.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-[10px] font-medium px-2 py-1 rounded-md"
-                        style={{
-                          backgroundColor: "#f0f0f0",
-                          color: "#666666",
-                        }}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <MapPin size={12} style={{ color: "#cccccc" }} />
-                    <span
-                      className="text-xs"
-                      style={{ color: "#aaaaaa" }}
-                    >
-                      {event.location}
-                    </span>
-                  </div>
+                  <a
+                    href={ctaHref}
+                    target={ctaExternal ? "_blank" : undefined}
+                    rel={ctaExternal ? "noopener noreferrer" : undefined}
+                    className="mt-auto inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-xs font-bold transition-all duration-300 hover:brightness-110"
+                    style={{
+                      backgroundColor: "#F6811E",
+                      color: "#fff",
+                      boxShadow: "0 2px 8px rgba(246,129,30,0.28)",
+                    }}
+                  >
+                    <MessageCircle size={14} />
+                    {ctaLabel}
+                    <ArrowRight size={13} />
+                  </a>
                 </div>
               </div>
             );

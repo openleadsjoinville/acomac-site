@@ -22,22 +22,25 @@ model GlobalContent {
 
 // ---------- Coleções dinâmicas ----------
 model Event {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  title       String
-  description String
-  content     String   @default("")
-  date        DateTime
-  endDate     DateTime?
-  location    String   @default("")
-  image       String   @default("")
-  ctaLabel    String   @default("")
-  ctaHref     String   @default("")
-  featured    Boolean  @default(false)
-  published   Boolean  @default(true)
-  orderIndex  Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  slug                  String   @unique
+  title                 String
+  description           String
+  content               String   @default("")
+  date                  DateTime
+  endDate               DateTime?
+  location              String   @default("")
+  image                 String   @default("")
+  ctaLabel              String   @default("")
+  ctaHref               String   @default("")
+  ctaType               String   @default("link")    // "whatsapp" or "link"
+  ctaWhatsappNumber     String   @default("")        // WhatsApp number with country code (e.g., 5547991103681)
+  ctaWhatsappMessage    String   @default("")        // Message to send when clicking WhatsApp button
+  featured              Boolean  @default(false)
+  published             Boolean  @default(true)
+  orderIndex            Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 }
 
 model Course {

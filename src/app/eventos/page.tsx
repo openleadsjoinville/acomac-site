@@ -20,6 +20,9 @@ function toDBEvent(e: {
   image: string;
   ctaLabel: string;
   ctaHref: string;
+  ctaType: string;
+  ctaWhatsappNumber: string;
+  ctaWhatsappMessage: string;
   featured: boolean;
 }): DBEvent {
   return {
@@ -33,6 +36,9 @@ function toDBEvent(e: {
     image: e.image,
     ctaLabel: e.ctaLabel,
     ctaHref: e.ctaHref,
+    ctaType: e.ctaType,
+    ctaWhatsappNumber: e.ctaWhatsappNumber,
+    ctaWhatsappMessage: e.ctaWhatsappMessage,
     featured: e.featured,
   };
 }

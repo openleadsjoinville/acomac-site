@@ -30,6 +30,9 @@ export type DBEvent = {
   image: string;
   ctaLabel: string;
   ctaHref: string;
+  ctaType: string;
+  ctaWhatsappNumber: string;
+  ctaWhatsappMessage: string;
   featured: boolean;
 };
 
@@ -74,6 +77,17 @@ function formatShortMonthDay(date: string): { mes: string; dia: string } {
     mes: MONTHS_PT[d.getMonth()],
     dia: d.getDate().toString().padStart(2, "0"),
   };
+}
+
+function getEventCtaLink(event: DBEvent): string {
+  // If ctaType is 'whatsapp' use WhatsApp link
+  if (event.ctaType === "whatsapp") {
+    const number = event.ctaWhatsappNumber || CTA_WHATSAPP;
+    const message = event.ctaWhatsappMessage || `Olá! Tenho interesse no evento "${event.title}".`;
+    return whatsappLink(number, message);
+  }
+  // Otherwise use ctaHref (link type)
+  return event.ctaHref || whatsappLink(CTA_WHATSAPP, `Olá! Tenho interesse no evento "${event.title}".`);
 }
 
 const CTA_WHATSAPP = "5547991103681";
@@ -218,14 +232,8 @@ export function EventosClient({
 
                   <div className="flex items-center gap-3">
                     <a
-                      href={
-                        featuredEvent.ctaHref ||
-                        whatsappLink(
-                          CTA_WHATSAPP,
-                          `Olá! Tenho interesse no evento "${featuredEvent.title}".`
-                        )
-                      }
-                      target={featuredEvent.ctaHref ? "_self" : "_blank"}
+                      href={getEventCtaLink(featuredEvent)}
+                      target={featuredEvent.ctaType === "link" && featuredEvent.ctaHref ? "_self" : "_blank"}
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all duration-300"
                       style={{
@@ -301,13 +309,14 @@ export function EventosClient({
                           border: "1px solid #eee",
                         }}
                       >
-                        <div className="relative w-full aspect-[16/9] overflow-hidden bg-gray-100">
+                        <div className="relative w-full overflow-hidden bg-gray-100">
                           <Image
                             src={e.image || FALLBACK_IMG}
                             alt={e.title}
-                            fill
+                            width={600}
+                            height={400}
                             sizes="(min-width: 768px) 50vw, 100vw"
-                            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                            className="w-full h-auto transition-transform duration-500 group-hover:scale-[1.03]"
                             unoptimized
                           />
                           <span
@@ -333,15 +342,15 @@ export function EventosClient({
                           </p>
 
                           <div
-                            className="flex flex-wrap gap-3 text-[12px] mb-4"
+                            className="space-y-2 text-[12px] mb-4"
                             style={{ color: "#666" }}
                           >
-                            <span className="inline-flex items-center gap-1.5">
+                            <span className="flex items-center gap-1.5">
                               <CalendarDays size={12} />
                               {formatRange(e.date, e.endDate)}
                             </span>
                             {e.location && (
-                              <span className="inline-flex items-center gap-1.5">
+                              <span className="flex items-center gap-1.5">
                                 <MapPin size={12} />
                                 {e.location}
                               </span>
@@ -349,14 +358,8 @@ export function EventosClient({
                           </div>
 
                           <a
-                            href={
-                              e.ctaHref ||
-                              whatsappLink(
-                                CTA_WHATSAPP,
-                                `Olá! Tenho interesse no evento "${e.title}".`
-                              )
-                            }
-                            target={e.ctaHref ? "_self" : "_blank"}
+                            href={getEventCtaLink(e)}
+                            target={e.ctaType === "link" && e.ctaHref ? "_self" : "_blank"}
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-[13px] font-bold self-stretch transition-all duration-300 hover:brightness-110"
                             style={{
@@ -458,14 +461,8 @@ export function EventosClient({
                         </div>
                       </div>
                       <a
-                        href={
-                          it.ctaHref ||
-                          whatsappLink(
-                            CTA_WHATSAPP,
-                            `Olá! Tenho interesse no evento "${it.title}".`
-                          )
-                        }
-                        target={it.ctaHref ? "_self" : "_blank"}
+                        href={getEventCtaLink(it)}
+                        target={it.ctaType === "link" && it.ctaHref ? "_self" : "_blank"}
                         rel="noopener noreferrer"
                         className="text-[13px] font-bold inline-flex items-center gap-1.5"
                         style={{ color: "#F6811E" }}
@@ -518,13 +515,14 @@ export function EventosClient({
                       opacity: 0.92,
                     }}
                   >
-                    <div className="relative w-full aspect-[16/9] overflow-hidden bg-gray-100">
+                    <div className="relative w-full overflow-hidden bg-gray-100">
                       <Image
                         src={e.image || FALLBACK_IMG}
                         alt={e.title}
-                        fill
+                        width={400}
+                        height={266}
                         sizes="(min-width: 768px) 33vw, 100vw"
-                        className="object-cover"
+                        className="w-full h-auto"
                         unoptimized
                       />
                       <div

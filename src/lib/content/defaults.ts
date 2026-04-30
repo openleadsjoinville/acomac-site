@@ -579,19 +579,19 @@ export const defaultConectaAssociados: ConectaAssociadosContent = {
     badge: "Conecta Associados",
     title: "Conheça quem faz parte da ACOMAC",
     subtitle:
-      "Encontre associados por segmento e conecte-se com os principais lojistas de SC.",
+      "Encontre as empresas associadas por segmento e conecte-se diretamente com quem faz parte da ACOMAC em Santa Catarina.",
     backgroundImage: "",
   },
   intro: {
     title: "O que é o Conecta Associados?",
     paragraphs: [
-      "Um diretório oficial dos associados ACOMAC, facilitando o networking entre lojistas, distribuidores e parceiros do setor.",
+      "Um diretório oficial das empresas associadas à ACOMAC, facilitando o networking entre associados, fornecedores e parceiros de diversos segmentos.",
     ],
   },
   registerCta: {
     title: "Quer fazer parte?",
     subtitle:
-      "Cadastre sua empresa e faça parte do maior diretório do varejo da construção em SC.",
+      "Cadastre sua empresa e participe da nossa rede de associados em Joinville e região.",
     ctaLabel: "Cadastrar minha empresa",
   },
   exitPopup: { ...emptyExit },

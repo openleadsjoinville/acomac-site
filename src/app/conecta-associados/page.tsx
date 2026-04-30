@@ -146,7 +146,7 @@ export default function ConectaAssociadosPage() {
               style={{ color: "rgba(255,255,255,0.65)" }}
             >
               {hero?.subtitle ??
-                "Uma rede de empresas do varejo de material de construção em Santa Catarina. Explore, filtre por categoria e entre em contato diretamente com quem conecta o setor."}
+                "Uma rede de empresas associadas à ACOMAC em Santa Catarina. Explore, filtre por categoria e entre em contato diretamente com quem faz parte da nossa associação."}
             </p>
           </div>
         </section>

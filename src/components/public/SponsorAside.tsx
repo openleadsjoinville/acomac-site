@@ -154,53 +154,20 @@ function MobileCard({ sponsor }: { sponsor: Sponsor }) {
       data-track="sponsor_native_click"
       data-track-label={sponsor.name}
       aria-label={`Anúncio: ${sponsor.name}`}
-      className="flex w-full rounded-2xl overflow-hidden"
+      className="block w-full rounded-2xl overflow-hidden"
       style={{
         background: "#fff",
         border: "1px solid #eceef2",
-        boxShadow: "0 8px 24px rgba(16,24,40,0.08)",
+        boxShadow: "0 2px 8px rgba(16,24,40,0.04)",
       }}
     >
       <div
-        className="flex-shrink-0"
+        className="w-full"
         style={{
-          width: 96,
-          minHeight: 152,
-          background: `#f7f7f7 url(${sponsor.image}) center/cover no-repeat`,
-          borderRight: "1px solid #eceef2",
+          aspectRatio: "3 / 2",
+          background: `#fff url(${sponsor.image}) center/contain no-repeat`,
         }}
       />
-      <div className="flex-1 min-w-0 p-4 flex flex-col">
-        <p
-          className="text-[9px] font-bold uppercase tracking-[0.2em] mb-1"
-          style={{ color: "#F6811E" }}
-        >
-          Patrocinador
-        </p>
-        <h4
-          className="text-[15px] font-extrabold leading-tight mb-1"
-          style={{ color: "#0e1a2b" }}
-        >
-          {sponsor.name}
-        </h4>
-        {sponsor.description && (
-          <p
-            className="text-[12px] leading-snug line-clamp-2 mb-3 flex-1"
-            style={{ color: "#5a6577" }}
-          >
-            {sponsor.description}
-          </p>
-        )}
-        {sponsor.url && (
-          <span
-            className="inline-flex items-center gap-1.5 self-start text-[12px] font-bold"
-            style={{ color: "#0059AB" }}
-          >
-            Visitar site
-            <ExternalLink size={12} />
-          </span>
-        )}
-      </div>
     </a>
   );
 }

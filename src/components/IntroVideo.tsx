@@ -9,8 +9,8 @@ import { useEffect, useRef, useState } from "react";
  * - Barra de progresso moderna sincronizada com o tempo do vídeo.
  */
 export default function IntroVideo({
-  webm = "/intro-acomac.webm",
-  mp4 = "/intro-acomac.mp4",
+  webm = "/intro-acomac.webm?v=2",
+  mp4 = "/intro-acomac.mp4?v=2",
 }: {
   webm?: string;
   mp4?: string;
@@ -76,7 +76,6 @@ export default function IntroVideo({
           muted
           playsInline
           preload="auto"
-          poster="/intro-poster.png"
           onEnded={dismiss}
           onError={dismiss}
           className="w-[240px] sm:w-[320px] md:w-[360px]"

@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, MessageCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { useInView, scaleIn, staggerStyle, slideInRight } from "@/hooks/useAnimations";
 import type { GlobalContent } from "@/lib/content/schema";
 import { resolveWhatsappCtaHref } from "@/lib/whatsapp";
+import { WhatsAppIcon } from "@/components/icons/SocialIcons";
 
 const defaultReasons = [
   "Representação perante órgãos públicos e entidades privadas",
@@ -129,7 +130,7 @@ export default function CTASection({
                   backgroundColor: "rgba(255,255,255,0.06)",
                 }}
               >
-                {secondaryIsWa && <MessageCircle size={16} />}
+                {secondaryIsWa && <WhatsAppIcon size={16} />}
                 {secondaryLabel}
               </a>
             </div>

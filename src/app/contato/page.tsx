@@ -323,7 +323,7 @@ export default function ContatoPage() {
 
         {/* FORM + MAP */}
         <section className="py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 xl:grid-cols-[1fr_200px] gap-12">
+          <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-12">
             <div
               ref={formRef}
               className="min-w-0 grid lg:grid-cols-12 gap-6"

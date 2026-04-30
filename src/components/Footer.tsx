@@ -6,7 +6,6 @@ import {
   Mail,
   Instagram,
   Facebook,
-  MessageCircle,
   ArrowUp,
   ArrowRight,
   Heart,
@@ -15,6 +14,7 @@ import Image from "next/image";
 import { useInView, staggerStyle, fadeIn } from "@/hooks/useAnimations";
 import type { GlobalContent } from "@/lib/content/schema";
 import { whatsappLink } from "@/lib/utils";
+import { WhatsAppIcon } from "@/components/icons/SocialIcons";
 
 export default function Footer({
   hideCta = false,
@@ -88,7 +88,7 @@ export default function Footer({
     },
     {
       href: whatsappHref,
-      icon: MessageCircle,
+      icon: WhatsAppIcon,
       label: "WhatsApp",
     },
   ].filter((s) => s.href);
@@ -182,7 +182,7 @@ export default function Footer({
                 e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
               }}
             >
-              <MessageCircle size={16} />
+              <WhatsAppIcon size={16} />
               {ctaData.secondaryLabel}
             </a>
           </div>
@@ -304,17 +304,16 @@ export default function Footer({
               >
                 Contato
               </h3>
-              <ul className="space-y-4">
-                <li className="flex gap-3">
-                  <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: "rgba(246,129,30,0.1)" }}
-                  >
-                    <MapPin size={15} style={{ color: "#F6811E" }} />
-                  </div>
+              <ul className="space-y-3.5">
+                <li className="flex gap-2.5">
+                  <MapPin
+                    size={15}
+                    className="mt-0.5 shrink-0"
+                    style={{ color: "rgba(255,255,255,0.45)" }}
+                  />
                   <div>
                     <p
-                      className="text-sm font-medium"
+                      className="text-sm"
                       style={{ color: "rgba(255,255,255,0.6)" }}
                     >
                       {contactInfo.address}
@@ -327,16 +326,15 @@ export default function Footer({
                     </p>
                   </div>
                 </li>
-                <li className="flex gap-3">
-                  <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: "rgba(0,89,171,0.1)" }}
-                  >
-                    <Phone size={15} style={{ color: "#0059AB" }} />
-                  </div>
+                <li className="flex gap-2.5">
+                  <Phone
+                    size={15}
+                    className="mt-0.5 shrink-0"
+                    style={{ color: "rgba(255,255,255,0.45)" }}
+                  />
                   <div>
                     <p
-                      className="text-sm font-medium"
+                      className="text-sm"
                       style={{ color: "rgba(255,255,255,0.6)" }}
                     >
                       {contactInfo.phone}
@@ -351,15 +349,14 @@ export default function Footer({
                     )}
                   </div>
                 </li>
-                <li className="flex gap-3">
-                  <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: "rgba(246,129,30,0.1)" }}
-                  >
-                    <Mail size={15} style={{ color: "#F6811E" }} />
-                  </div>
+                <li className="flex gap-2.5">
+                  <Mail
+                    size={15}
+                    className="mt-0.5 shrink-0"
+                    style={{ color: "rgba(255,255,255,0.45)" }}
+                  />
                   <p
-                    className="text-sm font-medium self-center"
+                    className="text-sm"
                     style={{ color: "rgba(255,255,255,0.6)" }}
                   >
                     {contactInfo.email}
@@ -437,6 +434,38 @@ export default function Footer({
                 </div>
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* ══════ Open Leads attribution ══════ */}
+        <div
+          style={{
+            borderTop: "1px solid rgba(255,255,255,0.06)",
+            backgroundColor: "rgba(0,0,0,0.25)",
+          }}
+        >
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-center gap-2 flex-wrap">
+            <span
+              className="text-[11px]"
+              style={{ color: "rgba(255,255,255,0.4)" }}
+            >
+              Feito orgulosamente por
+            </span>
+            <a
+              href="https://openleads.com.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open Leads"
+              className="inline-flex items-center transition-opacity duration-200 hover:opacity-80"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/document-uploads/Logo-fundo-transparente-1766854878509.png"
+                alt="Open Leads"
+                className="h-4 w-auto"
+                style={{ filter: "brightness(0) invert(1)" }}
+              />
+            </a>
           </div>
         </div>
       </div>

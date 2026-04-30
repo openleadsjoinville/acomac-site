@@ -271,12 +271,13 @@ function HoursDisplay({
   const statusStyle = (() => {
     if (status.state === "open") {
       return {
-        label: `Aberto agora · até ${formatMinutes(status.untilM)}`,
+        label: "Aberto",
         color: "#15803d",
-        bg: "rgba(22,163,74,0.10)",
-        border: "rgba(22,163,74,0.28)",
+        bg: "transparent",
+        border: "transparent",
         dot: "#16a34a",
-        glow: "0 0 0 3px rgba(22,163,74,0.22)",
+        glow: "none",
+        subtle: true,
       };
     }
     if (status.state === "lunch") {
@@ -287,6 +288,7 @@ function HoursDisplay({
         border: "rgba(246,129,30,0.30)",
         dot: "#F6811E",
         glow: "0 0 0 3px rgba(246,129,30,0.22)",
+        subtle: false,
       };
     }
     if (status.state === "closed" && status.openAgainM !== undefined) {
@@ -297,6 +299,7 @@ function HoursDisplay({
         border: "rgba(239,68,68,0.25)",
         dot: "#ef4444",
         glow: "none",
+        subtle: false,
       };
     }
     return {
@@ -306,6 +309,7 @@ function HoursDisplay({
       border: "rgba(239,68,68,0.25)",
       dot: "#ef4444",
       glow: "none",
+      subtle: false,
     };
   })();
 
@@ -323,16 +327,28 @@ function HoursDisplay({
           Atendimento
         </span>
         <span
-          className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em] px-2 py-0.5 rounded-full"
-          style={{
-            background: statusStyle.bg,
-            color: statusStyle.color,
-            border: `1px solid ${statusStyle.border}`,
-          }}
+          className={
+            statusStyle.subtle
+              ? "ml-auto inline-flex items-center gap-1 text-[9px] font-medium"
+              : "ml-auto inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em] px-2 py-0.5 rounded-full"
+          }
+          style={
+            statusStyle.subtle
+              ? { color: statusStyle.color }
+              : {
+                  background: statusStyle.bg,
+                  color: statusStyle.color,
+                  border: `1px solid ${statusStyle.border}`,
+                }
+          }
           aria-live="polite"
         >
           <span
-            className="inline-block w-1.5 h-1.5 rounded-full"
+            className={
+              statusStyle.subtle
+                ? "inline-block w-1 h-1 rounded-full"
+                : "inline-block w-1.5 h-1.5 rounded-full"
+            }
             style={{ background: statusStyle.dot, boxShadow: statusStyle.glow }}
           />
           {statusStyle.label}

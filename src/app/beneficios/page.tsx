@@ -269,7 +269,7 @@ export default function BeneficiosPage() {
 
         {/* BENEFITS GRID */}
         <section className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 xl:grid-cols-[1fr_200px] gap-12">
+          <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-12">
             <div className="min-w-0">
             <div
               ref={gridRef}

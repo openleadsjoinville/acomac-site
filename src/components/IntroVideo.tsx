@@ -19,6 +19,7 @@ export default function IntroVideo({
   const [fading, setFading] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [videoReady, setVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -70,24 +71,32 @@ export default function IntroVideo({
       aria-hidden={fading || !mounted}
     >
       <div className="flex flex-col items-center justify-center gap-6">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          onEnded={dismiss}
-          onError={dismiss}
-          className="w-[240px] sm:w-[320px] md:w-[360px]"
-          style={{
-            aspectRatio: "16 / 9",
-            objectFit: "contain",
-            background: "#ffffff",
-          }}
+        <div
+          className="relative w-[240px] sm:w-[320px] md:w-[360px]"
+          style={{ aspectRatio: "16 / 9", background: "#ffffff" }}
         >
-          <source src={webm} type="video/webm" />
-          <source src={mp4} type="video/mp4" />
-        </video>
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+            onLoadedData={() => setVideoReady(true)}
+            onPlaying={() => setVideoReady(true)}
+            onEnded={dismiss}
+            onError={dismiss}
+            className="absolute inset-0 w-full h-full"
+            style={{
+              objectFit: "contain",
+              background: "#ffffff",
+              opacity: videoReady ? 1 : 0,
+              transition: "opacity 0.2s ease",
+            }}
+          >
+            <source src={webm} type="video/webm" />
+            <source src={mp4} type="video/mp4" />
+          </video>
+        </div>
 
         {/* Barra de progresso moderna */}
         <div className="w-[240px] sm:w-[320px] md:w-[360px]">

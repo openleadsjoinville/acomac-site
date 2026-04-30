@@ -93,7 +93,7 @@ export function SponsorsClient() {
       <PageHeader
         eyebrow="Conteúdo"
         title="Patrocinadores"
-        subtitle="Banners verticais 160×600 (skyscraper) que rotacionam aleatoriamente na lateral das páginas internas — exibidos em telas largas (≥1280px). Cada visitante vê uma seleção diferente."
+        subtitle="Banners 300×200 (medium rectangle, 3:2) que rotacionam aleatoriamente na lateral das páginas internas — até 3 patrocinadores empilhados em telas largas (≥1280px). Cada visitante vê uma seleção diferente."
         actions={
           <button
             onClick={() => setEditing("new")}

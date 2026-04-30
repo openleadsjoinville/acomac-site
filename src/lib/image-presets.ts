@@ -159,11 +159,11 @@ export const CONTEXT_PRESETS = {
   } as ImagePreset,
   sponsorBanner: {
     label: "Banner do patrocinador",
-    width: 160,
-    height: 600,
-    aspect: 160 / 600,
-    hint: "Recomendado: 160×600 (vertical, formato skyscraper estilo Google Ads). Máx. 10MB.",
-    minHeight: 440,
+    width: 600,
+    height: 400,
+    aspect: 3 / 2,
+    hint: "Recomendado: 600×400 (formato 3:2). Aparece como medium rectangle 300×200 na lateral. Máx. 10MB.",
+    minHeight: 280,
   } as ImagePreset,
 } as const;
 

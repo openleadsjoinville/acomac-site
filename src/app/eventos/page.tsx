@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { getPageContent } from "@/lib/content/get";
 import { EventosClient, type DBEvent } from "./eventos-client";
+import { buildPageMetadata } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Eventos da ACOMAC — FENAC, Rodadas de Negócios e Networking",
+  description:
+    "Confira a agenda de eventos da ACOMAC Joinville: FENAC, rodadas de negócios, encontros com fornecedores, premiações e palestras para o setor de materiais de construção.",
+  path: "/eventos",
+});
 
 function eventIsPast(ev: { date: Date; endDate: Date | null }, now: Date): boolean {
   const ref = ev.endDate ?? ev.date;

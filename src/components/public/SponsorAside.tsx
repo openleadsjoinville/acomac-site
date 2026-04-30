@@ -83,14 +83,15 @@ function DesktopCard({ sponsor }: { sponsor: Sponsor }) {
       data-track="sponsor_aside_click"
       data-track-label={sponsor.name}
       aria-label={`Anúncio: ${sponsor.name}`}
-      className="group relative block w-[300px] h-[200px] rounded-xl overflow-hidden hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
+      className="group relative block w-[300px] h-[200px] rounded-xl overflow-hidden hover:shadow-md transition-all duration-300"
       style={{
         backgroundImage: `url(${sponsor.image})`,
-        backgroundSize: "cover",
+        backgroundSize: "contain",
         backgroundPosition: "center",
-        backgroundColor: "#f7f7f7",
+        backgroundRepeat: "no-repeat",
+        backgroundColor: "#fff",
         border: "1px solid #eceef2",
-        boxShadow: "0 6px 20px rgba(16,24,40,0.08)",
+        boxShadow: "0 2px 8px rgba(16,24,40,0.04)",
       }}
     >
       <div

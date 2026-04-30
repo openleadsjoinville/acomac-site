@@ -16,278 +16,10 @@ import {
   type AssociateItem,
 } from "@/components/public/AssociateCard";
 import { usePageContent } from "@/hooks/usePageContent";
+import { useCollection } from "@/hooks/useCollection";
 import { useInView, fadeIn, staggerStyle } from "@/hooks/useAnimations";
 
-const LOGO_PARAMS = "?w=400&h=400&fit=crop&q=80&auto=format";
-const COVER_PARAMS = "?w=1200&h=600&fit=crop&q=80&auto=format";
-
-const associados: AssociateItem[] = [
-  {
-    id: "demo-1",
-    companyName: "Construtotal Materiais",
-    displayName: null,
-    description:
-      "Loja completa de materiais básicos, cimento, argamassa e estruturas para obras residenciais e comerciais. Atendimento técnico consultivo e entrega em toda região.",
-    displayDescription: null,
-    logoUrl: `https://images.unsplash.com/photo-1541888946425-d81bb19240f5${LOGO_PARAMS}`,
-    displayLogo: null,
-    coverImage: `https://images.unsplash.com/photo-1504307651254-35680f356dfd${COVER_PARAMS}`,
-    city: "Joinville",
-    neighborhood: "Bucarein",
-    address: "Rua das Obras, 1250",
-    state: "SC",
-    phone: "(47) 3435-1100",
-    whatsapp: "5547988880001",
-    email: "contato@construtotal.com.br",
-    hours: "Seg–Sex 8h–18h · Sáb 8h–12h",
-    products:
-      "Cimento, Argamassa, Areia, Brita, Blocos, Vergalhões, Telhas",
-    yearsInMarket: 18,
-    segment: "Material de Construção",
-    website: "construtotal.com.br",
-    instagram: "construtotalmateriais",
-    facebook: null,
-  },
-  {
-    id: "demo-2",
-    companyName: "Eletro Sul Componentes",
-    displayName: null,
-    description:
-      "Fios, cabos, disjuntores e materiais elétricos de alta performance com as principais marcas do mercado. Projetos sob medida e pronta entrega.",
-    displayDescription: null,
-    logoUrl: `https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7${LOGO_PARAMS}`,
-    displayLogo: null,
-    coverImage: `https://images.unsplash.com/photo-1558449028-b53a39d100fc${COVER_PARAMS}`,
-    city: "Joinville",
-    neighborhood: "América",
-    address: "Rua Blumenau, 480",
-    state: "SC",
-    phone: "(47) 3028-4420",
-    whatsapp: "5547988880002",
-    email: "vendas@eletrosul.com.br",
-    hours: "Seg–Sex 8h–18h30 · Sáb 8h–13h",
-    products:
-      "Fios, Cabos, Disjuntores, Tomadas, Lâmpadas, Quadros, Eletrocalhas",
-    yearsInMarket: 12,
-    segment: "Elétrica",
-    website: "eletrosul.com.br",
-    instagram: "eletrosulcomponentes",
-    facebook: null,
-  },
-  {
-    id: "demo-3",
-    companyName: "Hidro Flux Soluções",
-    displayName: null,
-    description:
-      "Especializada em tubos, conexões, caixas d'água e sistemas completos de encanamento para obras de todos os portes. Estoque técnico e suporte a encanadores.",
-    displayDescription: null,
-    logoUrl: `https://images.unsplash.com/photo-1486406146926-c627a92ad1ab${LOGO_PARAMS}`,
-    displayLogo: null,
-    coverImage: `https://images.unsplash.com/photo-1581091226825-a6a2a5aee158${COVER_PARAMS}`,
-    city: "Araquari",
-    neighborhood: "Centro",
-    address: "Av. Getúlio Vargas, 760",
-    state: "SC",
-    phone: "(47) 3373-6650",
-    whatsapp: "5547988880003",
-    email: "atendimento@hidroflux.com.br",
-    hours: "Seg–Sex 7h30–18h · Sáb 8h–12h",
-    products:
-      "Tubos PVC, Conexões, Caixas d'água, Registros, Válvulas, Bombas",
-    yearsInMarket: 9,
-    segment: "Hidráulica",
-    website: null,
-    instagram: "hidrofluxsolucoes",
-    facebook: null,
-  },
-  {
-    id: "demo-4",
-    companyName: "Cores & Tons Tintas",
-    displayName: null,
-    description:
-      "Linha completa de tintas imobiliárias, texturas, vernizes e revestimentos decorativos com atendimento consultivo e máquina de tintometria.",
-    displayDescription: null,
-    logoUrl: `https://images.unsplash.com/photo-1562259949-e8e7689d7828${LOGO_PARAMS}`,
-    displayLogo: null,
-    coverImage: `https://images.unsplash.com/photo-1562259949-e8e7689d7828${COVER_PARAMS}`,
-    city: "Joinville",
-    neighborhood: "Santo Antônio",
-    address: "Rua dos Pintores, 330",
-    state: "SC",
-    phone: "(47) 3455-2277",
-    whatsapp: "5547988880004",
-    email: "ola@corestons.com.br",
-    hours: "Seg–Sex 8h–18h · Sáb 8h30–13h",
-    products:
-      "Tintas acrílicas, Esmalte, Textura, Verniz, Massa corrida, Selador",
-    yearsInMarket: 15,
-    segment: "Tintas e Acabamentos",
-    website: "corestons.com.br",
-    instagram: "corestonstintas",
-    facebook: null,
-  },
-  {
-    id: "demo-5",
-    companyName: "Ferragem Central",
-    displayName: null,
-    description:
-      "Ferramentas manuais, elétricas e industriais. Linha profissional para marceneiros, eletricistas e construtores com assistência técnica autorizada.",
-    displayDescription: null,
-    logoUrl: `https://images.unsplash.com/photo-1504148455328-c376907d081c${LOGO_PARAMS}`,
-    displayLogo: null,
-    coverImage: `https://images.unsplash.com/photo-1530124566582-a618bc2615dc${COVER_PARAMS}`,
-    city: "Jaraguá do Sul",
-    neighborhood: "Centro",
-    address: "Rua Reinoldo Rau, 230",
-    state: "SC",
-    phone: "(47) 3274-8910",
-    whatsapp: "5547988880005",
-    email: "comercial@ferragemcentral.com.br",
-    hours: "Seg–Sex 8h–18h · Sáb 8h–12h30",
-    products:
-      "Furadeiras, Parafusadeiras, Serras, EPIs, Kits, Chaves, Fixadores",
-    yearsInMarket: 22,
-    segment: "Ferramentas",
-    website: "ferragemcentral.com.br",
-    instagram: "ferragemcentralsc",
-    facebook: null,
-  },
-  {
-    id: "demo-6",
-    companyName: "Madeireira Três Pinheiros",
-    displayName: null,
-    description:
-      "Madeiras nobres, compensados, MDF e estruturas para telhados. Corte sob medida, entrega regional e atendimento a construtoras.",
-    displayDescription: null,
-    logoUrl: `https://images.unsplash.com/photo-1504307651254-35680f356dfd${LOGO_PARAMS}`,
-    displayLogo: null,
-    coverImage: `https://images.unsplash.com/photo-1513467535987-fd81bc7d62f8${COVER_PARAMS}`,
-    city: "São Bento do Sul",
-    neighborhood: "Centenário",
-    address: "BR-280, km 62",
-    state: "SC",
-    phone: "(47) 3631-0045",
-    whatsapp: "5547988880006",
-    email: "madeireira@trespinheiros.com.br",
-    hours: "Seg–Sex 7h30–17h30 · Sáb 8h–11h30",
-    products:
-      "Compensados, MDF, Pinus, Eucalipto, Ripas, Caibros, Telhas shingle",
-    yearsInMarket: 27,
-    segment: "Madeira",
-    website: "trespinheiros.com.br",
-    instagram: null,
-    facebook: "madeireiratrespinheiros",
-  },
-  {
-    id: "demo-7",
-    companyName: "AquaLife Piscinas",
-    displayName: null,
-    description:
-      "Piscinas pré-moldadas, produtos de tratamento, bombas, filtros e acessórios para lazer residencial e condomínios. Assistência técnica especializada.",
-    displayDescription: null,
-    logoUrl: `https://images.unsplash.com/photo-1519167758481-83f550bb49b3${LOGO_PARAMS}`,
-    displayLogo: null,
-    coverImage: `https://images.unsplash.com/photo-1540541338287-41700207dee6${COVER_PARAMS}`,
-    city: "Balneário Camboriú",
-    neighborhood: "Centro",
-    address: "Av. Brasil, 1500",
-    state: "SC",
-    phone: "(47) 3367-9912",
-    whatsapp: "5547988880007",
-    email: "vendas@aqualifepiscinas.com.br",
-    hours: "Seg–Sex 9h–18h · Sáb 9h–13h",
-    products:
-      "Piscinas prontas, Bombas, Filtros, Cloro, Aquecedores, Iluminação",
-    yearsInMarket: 11,
-    segment: "Piscinas",
-    website: "aqualifepiscinas.com.br",
-    instagram: "aqualifepiscinasbc",
-    facebook: null,
-  },
-  {
-    id: "demo-8",
-    companyName: "VidroMax Joinville",
-    displayName: null,
-    description:
-      "Vidros temperados, box para banheiro, espelhos, fachadas e esquadrias de alumínio com instalação profissional e garantia estendida.",
-    displayDescription: null,
-    logoUrl: `https://images.unsplash.com/photo-1487958449943-2429e8be8625${LOGO_PARAMS}`,
-    displayLogo: null,
-    coverImage: `https://images.unsplash.com/photo-1506905925346-21bda4d32df4${COVER_PARAMS}`,
-    city: "Joinville",
-    neighborhood: "Atiradores",
-    address: "Rua XV de Novembro, 2100",
-    state: "SC",
-    phone: "(47) 3422-5588",
-    whatsapp: "5547988880008",
-    email: "atendimento@vidromax.com.br",
-    hours: "Seg–Sex 8h–18h · Sáb 8h–12h",
-    products:
-      "Box banheiro, Espelhos, Fachadas, Esquadrias, Guarda-corpos, Coberturas",
-    yearsInMarket: 16,
-    segment: "Vidraçaria",
-    website: "vidromax.com.br",
-    instagram: "vidromaxjoinville",
-    facebook: null,
-  },
-  {
-    id: "demo-9",
-    companyName: "Solaris Energia",
-    displayName: null,
-    description:
-      "Projetos completos de energia solar fotovoltaica residencial e comercial com financiamento facilitado e monitoramento em tempo real.",
-    displayDescription: null,
-    logoUrl: `https://images.unsplash.com/photo-1509391366360-2e959784a276${LOGO_PARAMS}`,
-    displayLogo: null,
-    coverImage: `https://images.unsplash.com/photo-1509391366360-2e959784a276${COVER_PARAMS}`,
-    city: "Joinville",
-    neighborhood: "Anita Garibaldi",
-    address: "Rua Tuiuti, 875",
-    state: "SC",
-    phone: "(47) 3041-7733",
-    whatsapp: "5547988880009",
-    email: "projetos@solarisenergia.com.br",
-    hours: "Seg–Sex 8h30–18h",
-    products:
-      "Painéis solares, Inversores, Baterias, Estruturas, Monitoramento",
-    yearsInMarket: 7,
-    segment: "Energia Solar",
-    website: "solarisenergia.com.br",
-    instagram: "solarisenergia.sc",
-    facebook: null,
-  },
-  {
-    id: "demo-10",
-    companyName: "Piso Nobre Revestimentos",
-    displayName: null,
-    description:
-      "Porcelanatos, cerâmicas, pisos vinílicos e laminados das melhores marcas com showroom e consultoria de ambientes por arquitetos parceiros.",
-    displayDescription: null,
-    logoUrl: `https://images.unsplash.com/photo-1600607687939-ce8a6c25118c${LOGO_PARAMS}`,
-    displayLogo: null,
-    coverImage: `https://images.unsplash.com/photo-1600607687939-ce8a6c25118c${COVER_PARAMS}`,
-    city: "Joinville",
-    neighborhood: "Costa e Silva",
-    address: "Av. Santos Dumont, 3200",
-    state: "SC",
-    phone: "(47) 3436-0099",
-    whatsapp: "5547988880010",
-    email: "showroom@pisonobre.com.br",
-    hours: "Seg–Sex 8h30–19h · Sáb 9h–14h",
-    products:
-      "Porcelanato, Cerâmica, Vinílico, Laminado, Pedras, Decks, Rodapés",
-    yearsInMarket: 14,
-    segment: "Revestimentos",
-    website: "pisonobre.com.br",
-    instagram: "pisonobrejoinville",
-    facebook: null,
-  },
-];
-
-const categorias = [
-  "Todos",
-  ...Array.from(new Set(associados.map((a) => a.segment ?? ""))).filter(Boolean),
-];
+// Associados são buscados de /api/public/associates (apenas com status APPROVED)
 
 export default function ConectaAssociadosPage() {
   const page = usePageContent("conecta-associados");
@@ -299,6 +31,22 @@ export default function ConectaAssociadosPage() {
   const { ref: heroRef, inView: heroInView } = useInView(0.12);
   const { ref: filtroRef, inView: filtroInView } = useInView(0.12);
   const { ref: gridRef, inView: gridInView } = useInView(0.05);
+
+  const associadosData = useCollection<AssociateItem>("/api/public/associates");
+  const associados = useMemo<AssociateItem[]>(
+    () => associadosData ?? [],
+    [associadosData]
+  );
+
+  const categorias = useMemo(
+    () => [
+      "Todos",
+      ...Array.from(
+        new Set(associados.map((a) => a.segment ?? ""))
+      ).filter(Boolean),
+    ],
+    [associados]
+  );
 
   const filtrados = useMemo(() => {
     return associados.filter((a) => {
@@ -318,7 +66,7 @@ export default function ConectaAssociadosPage() {
         city.includes(termo);
       return matchCat && matchBusca;
     });
-  }, [categoriaAtiva, busca]);
+  }, [categoriaAtiva, busca, associados]);
 
   return (
     <>

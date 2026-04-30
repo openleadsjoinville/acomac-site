@@ -32,17 +32,24 @@ export default function HeroSection({
     <section
       id="inicio"
       className="relative min-h-screen flex items-center overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(135deg, #002952 0%, #0059AB 55%, #0068c7 100%)",
+      }}
     >
       {/* Background video or image */}
       {hero.backgroundVideo ? (
         <video
           className="absolute inset-0 z-0 w-full h-full object-cover"
           src={hero.backgroundVideo}
+          poster={hero.backgroundImage || undefined}
           autoPlay
           loop
           muted
           playsInline
+          preload="auto"
           key={hero.backgroundVideo}
+          style={{ backgroundColor: "#0059AB" }}
         />
       ) : hero.backgroundImage ? (
         // eslint-disable-next-line @next/next/no-img-element

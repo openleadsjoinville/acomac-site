@@ -75,6 +75,8 @@ export default function IntroVideo({
           autoPlay
           muted
           playsInline
+          preload="auto"
+          poster="/intro-poster.png"
           onEnded={dismiss}
           onError={dismiss}
           className="w-[240px] sm:w-[320px] md:w-[360px]"

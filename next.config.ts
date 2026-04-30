@@ -18,6 +18,25 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/associar",
+        destination: "/participe-do-conecta-associados",
+        permanent: true,
+      },
+      {
+        source: "/associar/:path*",
+        destination: "/participe-do-conecta-associados",
+        permanent: true,
+      },
+      {
+        source: "/conecta-associados/cadastro",
+        destination: "/participe-do-conecta-associados",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

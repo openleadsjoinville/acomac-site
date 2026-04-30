@@ -30,7 +30,7 @@ export default function CTASection({
   const globalWa = globalContent?.whatsapp?.number;
   const primaryHref = associateCta
     ? resolveWhatsappCtaHref(associateCta, globalWa)
-    : cta?.primaryHref ?? "/conecta-associados#cadastro";
+    : cta?.primaryHref ?? "/participe-do-conecta-associados";
   const primaryLabel = associateCta?.label || cta?.primaryLabel || "Quero me associar";
   const primaryIsWa = primaryHref.startsWith("https://wa.me");
   const secondaryHref = contactCta

@@ -20,7 +20,7 @@ export default function HeroSection({
       "A maior associação do varejo de material de construção de Santa Catarina. Unindo empresários, promovendo capacitação e impulsionando negócios há mais de 40 anos.",
     backgroundVideo: "/hero-bg.mp4",
     backgroundImage: "",
-    ctaPrimary: { label: "Associe-se agora", href: "/conecta-associados#cadastro" },
+    ctaPrimary: { label: "Associe-se agora", href: "/participe-do-conecta-associados" },
     ctaSecondary: { label: "Conheça a ACOMAC", href: "/sobre" },
     stats: [
       { value: "40+", label: "Anos de história" },

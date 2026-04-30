@@ -30,7 +30,7 @@ export default function Header({ globalContent }: { globalContent?: GlobalConten
   const ctaLabel = associateCta?.label || globalContent?.header.ctaLabel || "Associe-se";
   const ctaHref = associateCta
     ? resolveWhatsappCtaHref(associateCta, globalContent?.whatsapp?.number)
-    : globalContent?.header.ctaHref ?? "/conecta-associados#cadastro";
+    : globalContent?.header.ctaHref ?? "/participe-do-conecta-associados";
   const ctaIsWa = ctaHref.startsWith("https://wa.me");
   const topbar = globalContent?.header.topbar ?? {
     phone: "(47) 3435-0660",

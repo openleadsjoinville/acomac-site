@@ -56,7 +56,7 @@ export default function Footer({
     title: "Pronto para fortalecer seu negócio?",
     subtitle: "Junte-se a mais de 180 empresas que já confiam na ACOMAC.",
     primaryLabel: "Quero me associar",
-    primaryHref: "/conecta-associados#cadastro",
+    primaryHref: "/participe-do-conecta-associados",
     secondaryLabel: "WhatsApp",
     secondaryHref: "https://wa.me/554734350660",
   };

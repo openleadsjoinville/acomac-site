@@ -85,7 +85,7 @@ export const defaultGlobal: GlobalContent = {
         title: "Associados",
         links: [
           { label: "Conecta Associados", href: "/conecta-associados" },
-          { label: "Seja um associado", href: "/conecta-associados#cadastro" },
+          { label: "Seja um associado", href: "/participe-do-conecta-associados" },
           { label: "Área do associado", href: "#" },
         ],
       },
@@ -107,7 +107,7 @@ export const defaultGlobal: GlobalContent = {
     subtitle:
       "Capacitação, representatividade, convênios e uma rede que impulsiona o seu negócio.",
     primaryLabel: "Associe-se agora",
-    primaryHref: "/conecta-associados#cadastro",
+    primaryHref: "/participe-do-conecta-associados",
     secondaryLabel: "Fale com a gente",
     secondaryHref: "/contato",
   },
@@ -156,7 +156,7 @@ export const defaultHome: HomeContent = {
       "A maior associação do varejo de material de construção de Santa Catarina. Unindo empresários, promovendo capacitação e impulsionando negócios há mais de 40 anos.",
     backgroundVideo: "/hero-bg.mp4",
     backgroundImage: "",
-    ctaPrimary: { label: "Associe-se agora", href: "/conecta-associados#cadastro" },
+    ctaPrimary: { label: "Associe-se agora", href: "/participe-do-conecta-associados" },
     ctaSecondary: { label: "Conheça a ACOMAC", href: "/sobre" },
     stats: [
       { value: "40+", label: "Anos de história" },
@@ -471,7 +471,7 @@ export const defaultBeneficios: BeneficiosContent = {
     subtitle:
       "Associe-se e comece a aproveitar todos os benefícios hoje mesmo.",
     ctaLabel: "Quero me associar",
-    ctaHref: "/conecta-associados#cadastro",
+    ctaHref: "/participe-do-conecta-associados",
   },
   exitPopup: { ...emptyExit },
 };

@@ -19,7 +19,7 @@ const STATIC_ROUTES: Array<{
   { path: "/conecta-associados", changefreq: "weekly", priority: 0.8 },
   { path: "/blog", changefreq: "daily", priority: 0.8 },
   { path: "/contato", changefreq: "yearly", priority: 0.7 },
-  { path: "/associar", changefreq: "yearly", priority: 0.7 },
+  { path: "/participe-do-conecta-associados", changefreq: "yearly", priority: 0.7 },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

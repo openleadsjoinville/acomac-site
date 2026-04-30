@@ -384,7 +384,7 @@ export function AssociarWizard() {
       body: JSON.stringify({
         type: "form_submit",
         target: "associar",
-        path: "/associar",
+        path: "/participe-do-conecta-associados",
       }),
     }).catch(() => {});
     // Decolagem do foguete antes de abrir a tela de sucesso

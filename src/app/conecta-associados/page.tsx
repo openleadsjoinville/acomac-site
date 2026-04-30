@@ -313,7 +313,7 @@ export default function ConectaAssociadosPage() {
                 Exclusivo para associados ACOMAC. Se a sua empresa já é associada, preencha o cadastro rápido — após a aprovação, seu perfil aparece aqui e fica visível para toda a rede.
               </p>
               <a
-                href="/associar"
+                href="/participe-do-conecta-associados"
                 data-track="cta_associar"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-bold text-white transition-all duration-300 hover:-translate-y-0.5"
                 style={{

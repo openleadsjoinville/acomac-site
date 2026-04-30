@@ -7,7 +7,7 @@ export const metadata: Metadata = buildPageMetadata({
   title: "Associe sua loja à ACOMAC Joinville",
   description:
     "Cadastre sua loja de material de construção e participe da maior associação do varejo de SC. Descontos em convênios, capacitação, eventos e visibilidade no Conecta Associados.",
-  path: "/associar",
+  path: "/participe-do-conecta-associados",
 });
 
 export default function AssociarLayout({

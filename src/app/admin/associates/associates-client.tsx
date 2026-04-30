@@ -339,7 +339,7 @@ function RegisterLinkCard() {
     setOrigin(window.location.origin);
   }, []);
 
-  const url = origin ? `${origin}/associar` : "/associar";
+  const url = origin ? `${origin}/associar` : "/participe-do-conecta-associados";
 
   async function copy() {
     try {
@@ -385,7 +385,7 @@ function RegisterLinkCard() {
         </div>
         <div className="flex gap-2 flex-wrap">
           <a
-            href="/associar"
+            href="/participe-do-conecta-associados"
             target="_blank"
             rel="noreferrer"
             className="admin-btn admin-btn-ghost"

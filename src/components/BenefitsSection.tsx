@@ -361,7 +361,7 @@ export default function BenefitsSection({
           style={fadeIn(ctaInView, 0.1)}
         >
           <a
-            href={data?.ctaHref ?? "/conecta-associados#cadastro"}
+            href={data?.ctaHref ?? "/participe-do-conecta-associados"}
             className="group/cta inline-flex items-center gap-2.5 px-8 py-4 rounded-xl text-sm font-bold transition-all duration-300 hover:-translate-y-0.5"
             style={{
               backgroundColor: "#F6811E",

@@ -269,10 +269,10 @@ export const defaultHome: HomeContent = {
     ],
     image: "/Fachada acomac.png",
     features: [
-      { title: "Auditório", description: "Espaço para palestras e eventos.", image: "" },
-      { title: "Salas de treinamento", description: "Estrutura pra cursos presenciais.", image: "" },
-      { title: "Coworking", description: "Ambiente de trabalho compartilhado.", image: "" },
-      { title: "Estacionamento", description: "Amplo estacionamento próprio.", image: "" },
+      { title: "Auditório", description: "Espaço para palestras, assembleias e eventos da ACOMAC.", image: "/estrutura/auditorio.jpeg" },
+      { title: "Sala de Reuniões", description: "Ambiente reservado para encontros e reuniões da diretoria.", image: "/estrutura/sala-de-reunioes.jpeg" },
+      { title: "Sala de Treinamentos", description: "Estrutura completa para cursos presenciais e capacitação.", image: "/estrutura/sala-de-treinamentos.jpeg" },
+      { title: "Quiosque", description: "Área de convivência para confraternização e networking.", image: "/estrutura/quiosque.jpeg" },
     ],
   },
   courses: {

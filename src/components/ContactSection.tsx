@@ -9,12 +9,12 @@ import {
   Send,
   Instagram,
   Facebook,
-  MessageCircle,
   ArrowUpRight,
   ArrowRight,
   CheckCircle2,
 } from "lucide-react";
 import { useInView, fadeIn, staggerStyle } from "@/hooks/useAnimations";
+import { WhatsAppIcon } from "@/components/icons/SocialIcons";
 
 const contactCards = [
   {
@@ -34,7 +34,7 @@ const contactCards = [
     accent: "#F6811E",
   },
   {
-    icon: MessageCircle,
+    icon: WhatsAppIcon,
     title: "WhatsApp",
     value: "(47) 3435-0660",
     extra: "Atendimento rápido",
@@ -64,7 +64,7 @@ const socials = [
   },
   {
     href: "https://wa.me/554734350660",
-    icon: MessageCircle,
+    icon: WhatsAppIcon,
     label: "WhatsApp",
   },
 ];

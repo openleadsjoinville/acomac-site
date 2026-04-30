@@ -33,6 +33,7 @@ import {
   type AssociateItem,
 } from "@/components/public/AssociateCard";
 import type { GlobalContent } from "@/lib/content/schema";
+import { WhatsAppIcon } from "@/components/icons/SocialIcons";
 
 type DayKey = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
 type DayRange = { enabled: boolean; open: string; close: string };
@@ -1168,7 +1169,7 @@ function StepBody({
       <div className="grid gap-3">
         {[
           { icon: Trophy, title: "Apareça para o público certo", desc: "Seu perfil fica público no Conecta Associados do site ACOMAC." },
-          { icon: MessageCircle, title: "Contato direto por WhatsApp", desc: "Quem encontra sua empresa fala com você em 1 clique." },
+          { icon: WhatsAppIcon, title: "Contato direto por WhatsApp", desc: "Quem encontra sua empresa fala com você em 1 clique." },
           { icon: Rocket, title: "Aprovação rápida", desc: "A ACOMAC analisa e aprova em até 2 dias úteis." },
         ].map((b, i) => {
           const I = b.icon;

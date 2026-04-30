@@ -9,7 +9,6 @@ import {
   Send,
   Instagram,
   Facebook,
-  MessageCircle,
   ArrowUpRight,
   ArrowRight,
   Users,
@@ -22,6 +21,7 @@ import ClientSiteChrome from "@/components/ClientSiteChrome";
 import SponsorAside from "@/components/public/SponsorAside";
 import { usePageContent } from "@/hooks/usePageContent";
 import { useInView, fadeIn, staggerStyle } from "@/hooks/useAnimations";
+import { WhatsAppIcon } from "@/components/icons/SocialIcons";
 
 const contactCards = [
   {
@@ -41,7 +41,7 @@ const contactCards = [
     accent: "#F6811E",
   },
   {
-    icon: MessageCircle,
+    icon: WhatsAppIcon,
     title: "WhatsApp",
     value: "(47) 99110-3681",
     extra: "Atendimento rápido",
@@ -114,7 +114,7 @@ const socials = [
   },
   {
     href: "https://wa.me/5547991103681",
-    icon: MessageCircle,
+    icon: WhatsAppIcon,
     label: "WhatsApp",
   },
 ];

@@ -11,10 +11,10 @@ import {
   Trophy,
   Rocket,
   Clock,
-  MessageCircle,
 } from "lucide-react";
 import { useInView, fadeIn, staggerStyle } from "@/hooks/useAnimations";
 import { whatsappLink } from "@/lib/utils";
+import { WhatsAppIcon } from "@/components/icons/SocialIcons";
 
 const events = [
   {
@@ -279,7 +279,7 @@ export default function EventsSection({
                     "0 4px 20px rgba(246,129,30,0.3)";
                 }}
               >
-                <MessageCircle size={15} />
+                <WhatsAppIcon size={15} />
                 {data?.ctaLabel ?? (featured as { ctaLabel?: string }).ctaLabel ?? "Quero participar"}
                 <ArrowRight
                   size={15}
@@ -431,7 +431,7 @@ export default function EventsSection({
                       boxShadow: "0 2px 8px rgba(246,129,30,0.28)",
                     }}
                   >
-                    <MessageCircle size={14} />
+                    <WhatsAppIcon size={14} />
                     {ctaLabel}
                     <ArrowRight size={13} />
                   </a>

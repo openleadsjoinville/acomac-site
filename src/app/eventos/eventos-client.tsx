@@ -7,7 +7,6 @@ import {
   MapPin,
   ArrowRight,
   Ticket,
-  MessageCircle,
   CalendarRange,
   History,
 } from "lucide-react";
@@ -15,6 +14,7 @@ import ClientSiteChrome from "@/components/ClientSiteChrome";
 import SponsorAside from "@/components/public/SponsorAside";
 import { useInView, fadeIn, staggerStyle } from "@/hooks/useAnimations";
 import { whatsappLink } from "@/lib/utils";
+import { WhatsAppIcon } from "@/components/icons/SocialIcons";
 
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=800&fit=crop&q=80&auto=format";
@@ -592,7 +592,7 @@ export function EventosClient({
                   boxShadow: "0 4px 24px rgba(246,129,30,0.3)",
                 }}
               >
-                <MessageCircle size={15} />
+                <WhatsAppIcon size={15} />
                 Falar no WhatsApp
               </a>
             </div>

@@ -3,11 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Animação de entrada mostrada a cada carregamento da home.
+ * Animação de entrada exibida apenas quando o usuário chega direto na home.
  * - Render por padrão no SSR (evita flash do conteúdo antes do overlay aparecer).
- * - Sem persistência de sessão: toca a vinheta TODA vez que a home carrega.
+ * - Persistência por sessão (sessionStorage): se o usuário já passou por outra
+ *   página do site ou já viu a vinheta, ela não toca de novo na mesma aba.
  * - Barra de progresso moderna sincronizada com o tempo do vídeo.
  */
+const INTRO_SEEN_KEY = "acomacIntroSeen";
+
 export default function IntroVideo({
   webm = "/intro-acomac.webm?v=2",
   mp4 = "/intro-acomac.mp4?v=2",
@@ -24,6 +27,13 @@ export default function IntroVideo({
 
   useEffect(() => {
     setMounted(true);
+    try {
+      if (sessionStorage.getItem(INTRO_SEEN_KEY) === "1") {
+        setDismissed(true);
+      }
+    } catch {
+      /* sessionStorage indisponível: deixa a vinheta tocar */
+    }
   }, []);
 
   // Lock body scroll enquanto ativo
@@ -51,6 +61,11 @@ export default function IntroVideo({
 
   function dismiss() {
     if (fading) return;
+    try {
+      sessionStorage.setItem(INTRO_SEEN_KEY, "1");
+    } catch {
+      /* ignore */
+    }
     setProgress(100);
     setFading(true);
     setTimeout(() => setDismissed(true), 520);

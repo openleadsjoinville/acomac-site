@@ -396,12 +396,25 @@ function HoursDisplay({
   );
 }
 
+const DESCRIPTION_CHAR_LIMIT = 160;
+
+function truncateAtWord(text: string, limit: number): string {
+  if (text.length <= limit) return text;
+  const cut = text.slice(0, limit);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > limit * 0.6 ? cut.slice(0, lastSpace) : cut).trimEnd() + "…";
+}
+
 export function AssociateCard({
   item,
   onOpenMap,
+  expanded = false,
+  onToggleExpand,
 }: {
   item: AssociateItem;
   onOpenMap: () => void;
+  expanded?: boolean;
+  onToggleExpand?: () => void;
 }) {
   const name = item.displayName || item.companyName;
   const description = item.displayDescription || item.description || "";
@@ -418,9 +431,17 @@ export function AssociateCard({
     .join(" · ");
   const hoursInsight = useHoursInsight(item.hours);
 
+  const isLongDescription = description.length > DESCRIPTION_CHAR_LIMIT;
+  // Sem onToggleExpand (preview do wizard, etc.) mostra completo sem o ver mais.
+  const canToggle = !!onToggleExpand;
+  const showFullDescription = !canToggle || expanded || !isLongDescription;
+  const visibleDescription = showFullDescription
+    ? description
+    : truncateAtWord(description, DESCRIPTION_CHAR_LIMIT);
+
   return (
     <article
-      className="rounded-3xl overflow-hidden flex flex-col"
+      className="rounded-3xl overflow-hidden flex flex-col h-full"
       style={{
         background: "#fff",
         border: "1px solid #eceef2",
@@ -493,10 +514,24 @@ export function AssociateCard({
 
         {description && (
           <p
-            className="text-sm leading-relaxed line-clamp-3 mb-4"
+            className="text-sm leading-relaxed mb-4"
             style={{ color: "#5a6577" }}
           >
-            {description}
+            {visibleDescription}
+            {isLongDescription && onToggleExpand && (
+              <>
+                {" "}
+                <button
+                  type="button"
+                  onClick={onToggleExpand}
+                  className="font-semibold hover:underline cursor-pointer"
+                  style={{ color: "#0059AB", background: "none", border: 0, padding: 0 }}
+                  aria-expanded={expanded}
+                >
+                  {expanded ? "ver menos" : "ver mais"}
+                </button>
+              </>
+            )}
           </p>
         )}
 

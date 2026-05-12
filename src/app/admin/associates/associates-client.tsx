@@ -29,6 +29,7 @@ import { WhatsAppIcon } from "@/components/icons/SocialIcons";
 import { PageHeader, Panel, EmptyState } from "../_components/ui";
 import { LargeImageField } from "@/components/ui/LargeImageField";
 import { CONTEXT_PRESETS } from "@/lib/image-presets";
+import { useAdminTheme } from "../_components/theme-provider";
 
 type Associate = {
   id: string;
@@ -355,6 +356,9 @@ function AnalyticsModal({
   // Portal só renderiza no client (document.body só existe depois do mount).
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  // Portal escapa do <div class="admin-root">, então as CSS vars
+  // (--admin-surface etc.) não existem aqui. Reenvelopa com o mesmo escopo.
+  const { theme } = useAdminTheme();
 
   useEffect(() => {
     let alive = true;
@@ -444,7 +448,7 @@ function AnalyticsModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-4"
+      className={`admin-root${theme === "dark" ? " dark" : ""} fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-4`}
       style={{ background: "rgba(5,7,12,0.7)", backdropFilter: "blur(4px)" }}
       onClick={onClose}
     >

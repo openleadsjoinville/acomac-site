@@ -26,6 +26,7 @@ import {
   Megaphone,
 } from "lucide-react";
 import { useAdminTheme } from "./theme-provider";
+import { NotificationBell } from "./notification-bell";
 
 type NavItem = {
   href: string;
@@ -336,6 +337,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 month: "short",
               })}
             </span>
+            <NotificationBell />
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg transition-colors"

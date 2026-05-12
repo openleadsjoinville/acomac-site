@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast, Toaster } from "sonner";
 import {
   UserCheck,
@@ -351,6 +352,9 @@ function AnalyticsModal({
 }) {
   const [data, setData] = useState<AnalyticsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Portal só renderiza no client (document.body só existe depois do mount).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     let alive = true;
@@ -436,9 +440,11 @@ function AnalyticsModal({
     },
   ];
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-4"
       style={{ background: "rgba(5,7,12,0.7)", backdropFilter: "blur(4px)" }}
       onClick={onClose}
     >
@@ -583,7 +589,8 @@ function AnalyticsModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

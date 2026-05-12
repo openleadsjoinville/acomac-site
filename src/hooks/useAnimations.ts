@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 /* ── Intersection Observer hook ─────────────────────────── */
 
 export function useInView(threshold = 0.15) {
-  const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
+  const [node, setNode] = useState<HTMLElement | null>(null);
+
+  // Callback ref: re-anexa o observer se o elemento for renderizado
+  // condicionalmente (ex.: grid que só aparece após fetch).
+  const ref = useCallback((el: HTMLElement | null) => {
+    setNode(el);
+  }, []);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    if (!node) return;
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -20,9 +25,9 @@ export function useInView(threshold = 0.15) {
       },
       { threshold }
     );
-    obs.observe(el);
+    obs.observe(node);
     return () => obs.disconnect();
-  }, [threshold]);
+  }, [node, threshold]);
 
   return { ref, inView };
 }

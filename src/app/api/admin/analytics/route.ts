@@ -87,7 +87,10 @@ export async function GET(req: Request) {
   ]);
 
   const whatsappClicks = clicks.filter((e) => e.target.includes("whatsapp")).length;
-  const formSubmits = events.filter((e) => e.type === "form_submit").length;
+  const submits = events.filter((e) => e.type === "form_submit");
+  const contactSubmits = submits.filter((e) => e.target !== "associar").length;
+  const associateSubmits = submits.filter((e) => e.target === "associar").length;
+  const formSubmits = submits.length; // legado, soma dos dois
 
   return NextResponse.json({
     kpis: {
@@ -97,6 +100,8 @@ export async function GET(req: Request) {
       pageviews30d: pageviews.length,
       whatsappClicks,
       formSubmits,
+      contactSubmits,
+      associateSubmits,
       messagesCount,
       unreadMessages,
       associatesPending,

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { sendNotificationEmail, esc } from "@/lib/email";
 
 const RegisterSchema = z.object({
   companyName: z.string().min(2, "Nome obrigatório"),
@@ -68,5 +69,35 @@ export async function POST(req: Request) {
       status: "PENDING",
     },
   });
+
+  // Notificação por email pra aprovar com 1 clique (não bloqueia o response)
+  const location = [data.neighborhood, data.city, data.state].filter(Boolean).join(", ");
+  void sendNotificationEmail({
+    subject: `Novo cadastro Conecta Associados — ${data.companyName}`,
+    replyTo: data.email,
+    html: `
+      <h2 style="margin:0 0 12px 0;font-family:system-ui,sans-serif;color:#0e1a2b">Nova empresa quer entrar no Conecta Associados</h2>
+      <table cellpadding="6" style="font-family:system-ui,sans-serif;font-size:14px;color:#0e1a2b">
+        <tr><td><strong>Empresa:</strong></td><td>${esc(data.companyName)}</td></tr>
+        ${data.cnpj ? `<tr><td><strong>CNPJ:</strong></td><td>${esc(data.cnpj)}</td></tr>` : ""}
+        ${data.segment ? `<tr><td><strong>Segmento:</strong></td><td>${esc(data.segment)}</td></tr>` : ""}
+        <tr><td><strong>Contato:</strong></td><td>${esc(data.contactName)}</td></tr>
+        <tr><td><strong>Telefone:</strong></td><td>${esc(data.phone)}</td></tr>
+        <tr><td><strong>Email:</strong></td><td><a href="mailto:${esc(data.email)}">${esc(data.email)}</a></td></tr>
+        ${location ? `<tr><td><strong>Endereço:</strong></td><td>${esc(location)}</td></tr>` : ""}
+        ${data.description ? `<tr><td valign="top"><strong>Descrição:</strong></td><td style="white-space:pre-wrap">${esc(data.description)}</td></tr>` : ""}
+      </table>
+      <p style="margin-top:18px;font-family:system-ui,sans-serif">
+        <a href="https://www.acomacjoinville.com.br/admin/associates"
+           style="display:inline-block;background:#F6811E;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">
+          Revisar e aprovar
+        </a>
+      </p>
+      <p style="margin-top:8px;font-size:12px;color:#6b7486;font-family:system-ui,sans-serif">
+        Cadastro registrado como pendente até a aprovação.
+      </p>
+    `,
+  });
+
   return NextResponse.json({ ok: true, id: record.id });
 }

@@ -36,6 +36,8 @@ type Analytics = {
     pageviews30d: number;
     whatsappClicks: number;
     formSubmits: number;
+    contactSubmits: number;
+    associateSubmits: number;
     messagesCount: number;
     unreadMessages: number;
     associatesPending: number;
@@ -111,7 +113,7 @@ export function Dashboard() {
 
       <div className="px-6 lg:px-8 pb-10 space-y-6">
         {/* KPIs */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <KPICard
             label="Visitantes hoje"
             value={kpis?.visitorsToday ?? "—"}
@@ -134,11 +136,18 @@ export function Dashboard() {
             icon={<MessageCircle size={15} />}
           />
           <KPICard
-            label="Formulários"
-            value={kpis?.formSubmits ?? "—"}
-            hint="Envios no período"
+            label="Contatos recebidos"
+            value={kpis?.contactSubmits ?? "—"}
+            hint="Form. da página de contato"
             accent="warning"
             icon={<Inbox size={15} />}
+          />
+          <KPICard
+            label="Cadastros Conecta"
+            value={kpis?.associateSubmits ?? "—"}
+            hint="Empresas que se inscreveram"
+            accent="warning"
+            icon={<UserCheck size={15} />}
           />
         </div>
 

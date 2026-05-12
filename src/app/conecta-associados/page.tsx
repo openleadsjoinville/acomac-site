@@ -21,6 +21,16 @@ import { useInView, fadeIn, staggerStyle } from "@/hooks/useAnimations";
 
 // Associados são buscados de /api/public/associates (apenas com status APPROVED)
 
+// Fisher-Yates: embaralha uma cópia sem mutar o original.
+function shuffle<T>(arr: T[]): T[] {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 // Detecta a contagem de colunas do grid de cards conforme breakpoint do Tailwind
 // (grid md:grid-cols-2 xl:grid-cols-3): <768 = 1, 768-1280 = 2, >=1280 = 3.
 function useColumnCount(): number {
@@ -51,8 +61,11 @@ export default function ConectaAssociadosPage() {
   const { ref: gridRef, inView: gridInView } = useInView(0.05);
 
   const associadosData = useCollection<AssociateItem>("/api/public/associates");
+  // Embaralha a cada carregamento da página (sem privilégio de ordem fixa).
+  // Filtros/busca não embaralham de novo: a referência de associadosData só muda
+  // quando o fetch retorna dados novos (1x por mount).
   const associados = useMemo<AssociateItem[]>(
-    () => associadosData ?? [],
+    () => shuffle(associadosData ?? []),
     [associadosData]
   );
 

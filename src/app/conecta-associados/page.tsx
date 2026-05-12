@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Search,
   ArrowRight,
@@ -21,12 +21,30 @@ import { useInView, fadeIn, staggerStyle } from "@/hooks/useAnimations";
 
 // Associados são buscados de /api/public/associates (apenas com status APPROVED)
 
+// Detecta a contagem de colunas do grid de cards conforme breakpoint do Tailwind
+// (grid md:grid-cols-2 xl:grid-cols-3): <768 = 1, 768-1280 = 2, >=1280 = 3.
+function useColumnCount(): number {
+  const [cols, setCols] = useState(3);
+  useEffect(() => {
+    const compute = () => {
+      const w = window.innerWidth;
+      setCols(w >= 1280 ? 3 : w >= 768 ? 2 : 1);
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, []);
+  return cols;
+}
+
 export default function ConectaAssociadosPage() {
   const page = usePageContent("conecta-associados");
   const hero = page?.hero;
   const [categoriaAtiva, setCategoriaAtiva] = useState<string>("Todos");
   const [busca, setBusca] = useState("");
   const [mapFor, setMapFor] = useState<AssociateItem | null>(null);
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  const cols = useColumnCount();
 
   const { ref: heroRef, inView: heroInView } = useInView(0.12);
   const { ref: filtroRef, inView: filtroInView } = useInView(0.12);
@@ -67,6 +85,21 @@ export default function ConectaAssociadosPage() {
       return matchCat && matchBusca;
     });
   }, [categoriaAtiva, busca, associados]);
+
+  // Filtros e mudança de colunas remapeiam os índices → indices de linha
+  // expandidas viram inconsistentes. Reseta pra não revelar/ocultar errado.
+  useEffect(() => {
+    setExpandedRows(new Set());
+  }, [categoriaAtiva, busca, cols]);
+
+  const toggleRow = (row: number) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(row)) next.delete(row);
+      else next.add(row);
+      return next;
+    });
+  };
 
   return (
     <>
@@ -264,16 +297,25 @@ export default function ConectaAssociadosPage() {
             ) : (
               <div
                 ref={gridRef}
-                className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 mt-10"
+                className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 mt-10 items-stretch"
               >
-                {filtrados.map((a, i) => (
-                  <div key={a.id} style={staggerStyle(gridInView, i, 0.04)}>
-                    <AssociateCard
-                      item={a}
-                      onOpenMap={() => setMapFor(a)}
-                    />
-                  </div>
-                ))}
+                {filtrados.map((a, i) => {
+                  const row = Math.floor(i / cols);
+                  return (
+                    <div
+                      key={a.id}
+                      className="h-full"
+                      style={staggerStyle(gridInView, i, 0.04)}
+                    >
+                      <AssociateCard
+                        item={a}
+                        onOpenMap={() => setMapFor(a)}
+                        expanded={expandedRows.has(row)}
+                        onToggleExpand={() => toggleRow(row)}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             )}
 

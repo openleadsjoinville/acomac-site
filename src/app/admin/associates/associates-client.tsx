@@ -20,7 +20,11 @@ import {
   Copy,
   ExternalLink,
   Share2,
+  BarChart3,
+  Eye,
+  Loader2,
 } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons/SocialIcons";
 import { PageHeader, Panel, EmptyState } from "../_components/ui";
 import { LargeImageField } from "@/components/ui/LargeImageField";
 import { CONTEXT_PRESETS } from "@/lib/image-presets";
@@ -52,6 +56,7 @@ export function AssociatesClient() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"ALL" | "PENDING" | "APPROVED" | "REJECTED">("PENDING");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [analyticsFor, setAnalyticsFor] = useState<Associate | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/associates")
@@ -139,11 +144,19 @@ export function AssociatesClient() {
                 onExpand={() => setExpanded(expanded === a.id ? null : a.id)}
                 onUpdate={(patch) => update(a.id, patch)}
                 onDelete={() => remove(a.id)}
+                onAnalytics={() => setAnalyticsFor(a)}
               />
             ))}
           </div>
         )}
       </div>
+
+      {analyticsFor && (
+        <AnalyticsModal
+          associate={analyticsFor}
+          onClose={() => setAnalyticsFor(null)}
+        />
+      )}
     </>
   );
 }
@@ -187,12 +200,14 @@ function AssociateRow({
   onExpand,
   onUpdate,
   onDelete,
+  onAnalytics,
 }: {
   item: Associate;
   expanded: boolean;
   onExpand: () => void;
   onUpdate: (patch: Partial<Associate>) => void;
   onDelete: () => void;
+  onAnalytics: () => void;
 }) {
   const [draft, setDraft] = useState(item);
   useEffect(() => setDraft(item), [item]);
@@ -232,6 +247,16 @@ function AssociateRow({
                 <X size={12} />
               </button>
             </>
+          )}
+          {item.status === "APPROVED" && (
+            <button
+              onClick={onAnalytics}
+              className="admin-btn admin-btn-ghost text-[11px] py-1.5 px-3"
+              title="Ver analytics deste associado"
+            >
+              <BarChart3 size={12} />
+              Analytics
+            </button>
           )}
           <button onClick={onExpand} className="admin-btn admin-btn-ghost text-[11px] py-1.5 px-3">
             <Edit3 size={12} />
@@ -297,6 +322,267 @@ function AssociateRow({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+type AnalyticsSummary = {
+  views: { total: number; unique: number };
+  whatsapp: { total: number; unique: number };
+  instagram: { total: number; unique: number };
+  phone: { total: number; unique: number };
+  location: { total: number; unique: number };
+  website: { total: number; unique: number };
+};
+
+type AnalyticsResponse = {
+  associate: { id: string; name: string };
+  summary: AnalyticsSummary;
+  totalEvents: number;
+  lastActivityAt: string | null;
+};
+
+function AnalyticsModal({
+  associate,
+  onClose,
+}: {
+  associate: Associate;
+  onClose: () => void;
+}) {
+  const [data, setData] = useState<AnalyticsResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    setData(null);
+    setError(null);
+    fetch(`/api/admin/associates/${associate.id}/analytics`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((d: AnalyticsResponse) => {
+        if (alive) setData(d);
+      })
+      .catch(() => {
+        if (alive) setError("Não foi possível carregar os dados");
+      });
+    return () => {
+      alive = false;
+    };
+  }, [associate.id]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
+  const name = associate.displayName || associate.companyName;
+  const logo = associate.displayLogo || associate.logoUrl;
+
+  const stats: Array<{
+    key: keyof AnalyticsSummary;
+    label: string;
+    icon: React.ReactNode;
+    color: string;
+    bg: string;
+  }> = [
+    {
+      key: "views",
+      label: "Visualizações do card",
+      icon: <Eye size={18} />,
+      color: "#0059AB",
+      bg: "rgba(0,89,171,0.12)",
+    },
+    {
+      key: "whatsapp",
+      label: "Cliques no WhatsApp",
+      icon: <WhatsAppIcon size={18} />,
+      color: "#15803d",
+      bg: "rgba(37,211,102,0.12)",
+    },
+    {
+      key: "instagram",
+      label: "Cliques no Instagram",
+      icon: <Instagram size={18} />,
+      color: "#be185d",
+      bg: "rgba(225,48,108,0.12)",
+    },
+    {
+      key: "phone",
+      label: "Cliques em Ligar",
+      icon: <Phone size={18} />,
+      color: "#0059AB",
+      bg: "rgba(0,89,171,0.12)",
+    },
+    {
+      key: "location",
+      label: "Cliques em Localização",
+      icon: <MapPin size={18} />,
+      color: "#b91c1c",
+      bg: "rgba(239,68,68,0.12)",
+    },
+    {
+      key: "website",
+      label: "Cliques em Visitar website",
+      icon: <Globe size={18} />,
+      color: "#7c3aed",
+      bg: "rgba(124,58,237,0.12)",
+    },
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4"
+      style={{ background: "rgba(5,7,12,0.7)", backdropFilter: "blur(4px)" }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full sm:max-w-2xl rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col"
+        style={{
+          background: "var(--admin-surface)",
+          border: "1px solid var(--admin-border)",
+          boxShadow: "0 30px 80px rgba(0,0,0,0.45)",
+          maxHeight: "calc(100vh - 24px)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className="flex items-start justify-between gap-3 px-5 py-4"
+          style={{ borderBottom: "1px solid var(--admin-border)" }}
+        >
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <div
+              className="h-12 w-12 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center"
+              style={{ background: "var(--admin-surface-2)" }}
+            >
+              {logo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logo} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-xs font-bold" style={{ color: "var(--admin-text-muted)" }}>
+                  {associate.companyName.slice(0, 2).toUpperCase()}
+                </span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p
+                className="text-[11px] font-bold uppercase tracking-[0.2em]"
+                style={{ color: "var(--admin-accent)" }}
+              >
+                Analytics
+              </p>
+              <h3 className="text-lg font-bold text-white truncate">{name}</h3>
+              <p className="text-xs" style={{ color: "var(--admin-text-muted)" }}>
+                Impacto do card no Conecta Associados
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-slate-700/30"
+            style={{ color: "var(--admin-text-muted)" }}
+            aria-label="Fechar"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="p-5 overflow-y-auto">
+          {error && (
+            <p className="text-sm py-8 text-center" style={{ color: "#f87171" }}>
+              {error}
+            </p>
+          )}
+          {!error && !data && (
+            <div
+              className="flex flex-col items-center justify-center gap-3 py-10"
+              style={{ color: "var(--admin-text-muted)" }}
+            >
+              <Loader2 size={22} className="animate-spin" />
+              <p className="text-xs">Carregando métricas…</p>
+            </div>
+          )}
+          {data && (
+            <>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {stats.map((s) => {
+                  const v = data.summary[s.key];
+                  return (
+                    <div
+                      key={s.key}
+                      className="rounded-xl p-4"
+                      style={{
+                        background: "var(--admin-surface-2)",
+                        border: "1px solid var(--admin-border)",
+                      }}
+                    >
+                      <div className="flex items-center gap-2.5 mb-3">
+                        <div
+                          className="h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                          style={{ background: s.bg, color: s.color }}
+                        >
+                          {s.icon}
+                        </div>
+                        <p
+                          className="text-[11px] font-semibold uppercase tracking-wider"
+                          style={{ color: "var(--admin-text-muted)" }}
+                        >
+                          {s.label}
+                        </p>
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <span
+                          className="text-3xl font-extrabold tabular-nums"
+                          style={{ color: "var(--admin-text-strong)" }}
+                        >
+                          {v.total.toLocaleString("pt-BR")}
+                        </span>
+                        <span
+                          className="text-[11px]"
+                          style={{ color: "var(--admin-text-subtle)" }}
+                        >
+                          {v.unique.toLocaleString("pt-BR")}{" "}
+                          {v.unique === 1 ? "pessoa única" : "pessoas únicas"}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div
+                className="mt-5 pt-4 flex items-center justify-between gap-3 text-xs"
+                style={{
+                  borderTop: "1px solid var(--admin-border)",
+                  color: "var(--admin-text-muted)",
+                }}
+              >
+                <span>
+                  Total de eventos registrados:{" "}
+                  <strong style={{ color: "var(--admin-text-strong)" }}>
+                    {data.totalEvents.toLocaleString("pt-BR")}
+                  </strong>
+                </span>
+                {data.lastActivityAt && (
+                  <span>
+                    Última atividade:{" "}
+                    {new Date(data.lastActivityAt).toLocaleString("pt-BR", {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })}
+                  </span>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

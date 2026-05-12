@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   if (!type || typeof type !== "string") {
     return NextResponse.json({ error: "type required" }, { status: 400 });
   }
-  const allowed = ["pageview", "click", "form_submit"];
+  const allowed = ["pageview", "click", "form_submit", "view"];
   if (!allowed.includes(type)) {
     return NextResponse.json({ error: "invalid type" }, { status: 400 });
   }

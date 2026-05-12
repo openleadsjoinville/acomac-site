@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Phone,
   MapPin,
@@ -439,8 +439,57 @@ export function AssociateCard({
     ? description
     : truncateAtWord(description, DESCRIPTION_CHAR_LIMIT);
 
+  // Tracking de view: dispara 1x por sessão por associado quando o card fica
+  // 50% visível no viewport. Permite contar impressões pra mostrar pro associado.
+  const articleRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!canToggle) return; // não trackeia em preview do wizard
+    const key = `assoc_view_${item.id}`;
+    try {
+      if (sessionStorage.getItem(key)) return;
+    } catch {
+      return;
+    }
+    const el = articleRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        try {
+          sessionStorage.setItem(key, "1");
+        } catch {
+          /* ignore */
+        }
+        // Mesma session id usada pelo Analytics, pra agrupar uniques.
+        let sessionId = "";
+        try {
+          sessionId = sessionStorage.getItem("acomac_sid") ?? "";
+        } catch {
+          /* ignore */
+        }
+        fetch("/api/track", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            type: "view",
+            target: "associate_view",
+            label: item.id,
+            sessionId,
+            path: typeof location !== "undefined" ? location.pathname : "",
+          }),
+          keepalive: true,
+        }).catch(() => {});
+        obs.disconnect();
+      },
+      { threshold: 0.5 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [item.id, canToggle]);
+
   return (
     <article
+      ref={articleRef}
       className="rounded-3xl overflow-hidden flex flex-col h-full"
       style={{
         background: "#fff",
@@ -570,7 +619,7 @@ export function AssociateCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 data-track="associate_instagram"
-                data-track-label={name}
+                data-track-label={item.id}
                 className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl text-[11px] font-semibold transition-colors hover:bg-slate-50"
                 style={{
                   background: "#fafbfc",
@@ -599,7 +648,7 @@ export function AssociateCard({
               <button
                 onClick={onOpenMap}
                 data-track="associate_location"
-                data-track-label={name}
+                data-track-label={item.id}
                 className="cursor-pointer flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl text-[11px] font-semibold transition-colors hover:bg-slate-50"
                 style={{
                   background: "#fafbfc",
@@ -628,7 +677,7 @@ export function AssociateCard({
               <a
                 href={`tel:${tel}`}
                 data-track="associate_phone"
-                data-track-label={name}
+                data-track-label={item.id}
                 className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl text-[11px] font-semibold transition-colors hover:bg-slate-50"
                 style={{
                   background: "#fafbfc",
@@ -663,6 +712,8 @@ export function AssociateCard({
               }
               target="_blank"
               rel="noopener noreferrer"
+              data-track="associate_website"
+              data-track-label={item.id}
               className="flex items-center justify-center gap-1.5 text-xs font-semibold pt-1"
               style={{ color: "#0059AB" }}
             >
@@ -678,7 +729,7 @@ export function AssociateCard({
               target="_blank"
               rel="noopener noreferrer"
               data-track="associate_whatsapp"
-              data-track-label={name}
+              data-track-label={item.id}
               className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold text-white transition-all hover:-translate-y-0.5"
               style={{
                 background: "#25D366",

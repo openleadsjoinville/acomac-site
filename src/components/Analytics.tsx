@@ -30,6 +30,16 @@ export default function Analytics() {
   const pathname = usePathname();
 
   useEffect(() => {
+    if (pathname && pathname !== "/") {
+      try {
+        sessionStorage.setItem("acomacIntroSeen", "1");
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [pathname]);
+
+  useEffect(() => {
     if (pathname?.startsWith("/admin")) return;
     const sessionId = getSessionId();
     void send({ type: "pageview", path: pathname ?? "", sessionId });

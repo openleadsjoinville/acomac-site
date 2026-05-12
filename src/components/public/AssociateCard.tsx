@@ -555,28 +555,14 @@ export function AssociateCard({
           </div>
         )}
 
+        {/* Ações secundárias: ficam acima do CTA principal.
+            Importante: o botão de WhatsApp é o ÚLTIMO elemento do card pra
+            que sua posição (Y) seja card_bottom - altura_do_botão — constante
+            entre todos os cards da linha, independente de ter website ou não. */}
         <div
           className="mt-auto pt-4 space-y-2.5"
           style={{ borderTop: "1px solid #eceef2" }}
         >
-          {wa && (
-            <a
-              href={wa}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-track="associate_whatsapp"
-              data-track-label={name}
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold text-white transition-all hover:-translate-y-0.5"
-              style={{
-                background: "#25D366",
-                boxShadow: "0 6px 20px rgba(37,211,102,0.3)",
-              }}
-            >
-              <WhatsAppIcon size={17} />
-              Entrar em contato no WhatsApp
-            </a>
-          )}
-
           <div className="grid grid-cols-3 gap-2">
             {item.instagram ? (
               <a
@@ -683,6 +669,24 @@ export function AssociateCard({
               <Globe size={12} />
               Visitar website
               <ExternalLink size={11} />
+            </a>
+          )}
+
+          {wa && (
+            <a
+              href={wa}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track="associate_whatsapp"
+              data-track-label={name}
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold text-white transition-all hover:-translate-y-0.5"
+              style={{
+                background: "#25D366",
+                boxShadow: "0 6px 20px rgba(37,211,102,0.3)",
+              }}
+            >
+              <WhatsAppIcon size={17} />
+              Entrar em contato no WhatsApp
             </a>
           )}
         </div>

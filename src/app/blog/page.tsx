@@ -224,7 +224,7 @@ export default function BlogIndex() {
           )}
 
           {/* LIST + SIDEBAR */}
-          <section className="max-w-[1440px] mx-auto px-6 pb-24 grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-12">
+          <section className="max-w-[1440px] mx-auto px-6 pb-24 grid grid-cols-1 xl:grid-cols-[1fr_260px] gap-12">
             <div className="min-w-0">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">

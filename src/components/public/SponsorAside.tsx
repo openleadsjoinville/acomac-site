@@ -83,7 +83,7 @@ function DesktopCard({ sponsor }: { sponsor: Sponsor }) {
       data-track="sponsor_aside_click"
       data-track-label={sponsor.name}
       aria-label={`Anúncio: ${sponsor.name}`}
-      className="group relative block w-[300px] h-[200px] rounded-xl overflow-hidden hover:shadow-md transition-all duration-300"
+      className="group relative block w-[240px] h-[160px] rounded-xl overflow-hidden hover:shadow-md transition-all duration-300"
       style={{
         backgroundImage: `url(${sponsor.image})`,
         backgroundSize: "contain",
@@ -201,9 +201,9 @@ export default function SponsorAside({
 
   return (
     <>
-      {/* DESKTOP — até 3 medium rectangle 300×250 empilhados */}
+      {/* DESKTOP — até 3 medium rectangle 240×160 empilhados */}
       <aside
-        className="hidden xl:block w-[300px] shrink-0"
+        className="hidden xl:block w-[240px] shrink-0"
         aria-label="Publicidade"
       >
         <div className="sticky" style={{ top: stickyTop }}>

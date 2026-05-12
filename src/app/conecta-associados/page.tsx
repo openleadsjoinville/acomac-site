@@ -186,7 +186,7 @@ export default function ConectaAssociadosPage() {
 
         {/* ═══════ FILTROS + GRID ═══════ */}
         <section className="relative py-20 bg-white">
-          <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-12">
+          <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 xl:grid-cols-[1fr_260px] gap-12">
             <div className="min-w-0">
             {/* Busca + chips */}
             <div ref={filtroRef} style={fadeIn(filtroInView)}>

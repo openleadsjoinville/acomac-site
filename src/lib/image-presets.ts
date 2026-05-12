@@ -162,7 +162,7 @@ export const CONTEXT_PRESETS = {
     width: 600,
     height: 400,
     aspect: 3 / 2,
-    hint: "Recomendado: 600×400 (formato 3:2). Aparece como medium rectangle 300×200 na lateral. Máx. 10MB.",
+    hint: "Recomendado: 600×400 (formato 3:2). Aparece como medium rectangle 240×160 na lateral. Máx. 10MB.",
     minHeight: 280,
   } as ImagePreset,
 } as const;

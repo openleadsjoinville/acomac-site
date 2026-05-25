@@ -34,6 +34,7 @@ import {
 } from "@/components/public/AssociateCard";
 import type { GlobalContent } from "@/lib/content/schema";
 import { WhatsAppIcon } from "@/components/icons/SocialIcons";
+import MarketingConsent from "@/components/MarketingConsent";
 
 type DayKey = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
 type DayRange = { enabled: boolean; open: string; close: string };
@@ -308,6 +309,7 @@ export function AssociarWizard() {
   const [sendError, setSendError] = useState<string | null>(null);
   const [global, setGlobal] = useState<GlobalContent | null>(null);
   const [launching, setLaunching] = useState(false);
+  const [marketingConsent, setMarketingConsent] = useState(false);
   const stepRef = useRef<HTMLDivElement>(null);
 
   const current = steps[stepIdx];
@@ -366,6 +368,7 @@ export function AssociarWizard() {
       segment: finalSegment,
       address: fullAddress,
       hours: formatHours(hoursSchedule, lunchBreak),
+      marketingConsent,
     };
     const res = await fetch("/api/associates", {
       method: "POST",
@@ -490,7 +493,13 @@ export function AssociarWizard() {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <StepBody stepId={current.id} form={form} set={set} />
+                  <StepBody
+                    stepId={current.id}
+                    form={form}
+                    set={set}
+                    marketingConsent={marketingConsent}
+                    setMarketingConsent={setMarketingConsent}
+                  />
                 </motion.div>
               </AnimatePresence>
 
@@ -1159,10 +1168,14 @@ function StepBody({
   stepId,
   form,
   set,
+  marketingConsent,
+  setMarketingConsent,
 }: {
   stepId: string;
   form: FormState;
   set: <K extends keyof FormState>(k: K, v: FormState[K]) => void;
+  marketingConsent: boolean;
+  setMarketingConsent: (v: boolean) => void;
 }) {
   if (stepId === "welcome") {
     return (
@@ -1428,6 +1441,12 @@ function StepBody({
             />
           )}
         </div>
+
+        <MarketingConsent
+          checked={marketingConsent}
+          onChange={setMarketingConsent}
+          id="wizard-marketing-consent"
+        />
       </div>
     );
   }

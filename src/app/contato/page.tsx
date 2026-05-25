@@ -22,6 +22,7 @@ import SponsorAside from "@/components/public/SponsorAside";
 import { usePageContent } from "@/hooks/usePageContent";
 import { useInView, fadeIn, staggerStyle } from "@/hooks/useAnimations";
 import { WhatsAppIcon } from "@/components/icons/SocialIcons";
+import MarketingConsent from "@/components/MarketingConsent";
 
 const contactCards = [
   {
@@ -150,6 +151,7 @@ export default function ContatoPage() {
     },
   ];
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [marketingConsent, setMarketingConsent] = useState(false);
 
   const { ref: heroRef, inView: heroInView } = useInView(0.12);
   const { ref: cardsRef, inView: cardsInView } = useInView(0.1);
@@ -468,6 +470,12 @@ export default function ContatoPage() {
                     onBlur={() => setFocusedField(null)}
                   />
                 </div>
+
+                <MarketingConsent
+                  checked={marketingConsent}
+                  onChange={setMarketingConsent}
+                  id="contato-marketing-consent"
+                />
 
                 <button
                   type="submit"

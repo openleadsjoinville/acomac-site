@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ImageUploader } from "@/components/ui/ImageUploader";
 import { CheckCircle2 } from "lucide-react";
+import MarketingConsent from "@/components/MarketingConsent";
 
 export default function AssociateRegisterForm() {
   const [form, setForm] = useState({
@@ -21,6 +22,7 @@ export default function AssociateRegisterForm() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState("");
+  const [marketingConsent, setMarketingConsent] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,7 +31,7 @@ export default function AssociateRegisterForm() {
     const res = await fetch("/api/associates", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, marketingConsent }),
     });
     setSending(false);
     if (!res.ok) {
@@ -109,6 +111,12 @@ export default function AssociateRegisterForm() {
           {err}
         </p>
       )}
+
+      <MarketingConsent
+        checked={marketingConsent}
+        onChange={setMarketingConsent}
+        id="associate-marketing-consent"
+      />
 
       <button
         type="submit"

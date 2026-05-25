@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useInView, fadeIn, staggerStyle } from "@/hooks/useAnimations";
 import { WhatsAppIcon } from "@/components/icons/SocialIcons";
+import MarketingConsent from "@/components/MarketingConsent";
 
 const contactCards = [
   {
@@ -80,6 +81,7 @@ export default function ContactSection({
   const { ref: cardsRef, inView: cardsInView } = useInView(0.08);
   const { ref: contentRef, inView: contentInView } = useInView(0.08);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [marketingConsent, setMarketingConsent] = useState(false);
 
   const inputStyle = (field: string) => ({
     borderColor: focusedField === field ? "#0059AB" : "#e8eaef",
@@ -385,6 +387,11 @@ export default function ContactSection({
                   onBlur={() => setFocusedField(null)}
                 />
               </div>
+              <MarketingConsent
+                checked={marketingConsent}
+                onChange={setMarketingConsent}
+                id="home-marketing-consent"
+              />
               <button
                 type="submit"
                 className="group/btn w-full py-4 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2.5 transition-all duration-300 hover:-translate-y-0.5"

@@ -378,12 +378,25 @@ export default function Footer({
             className="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-4"
             style={fadeIn(bottomInView, 0.1)}
           >
-            <p
-              className="text-xs flex items-center gap-1"
+            <div
+              className="text-xs flex flex-col md:flex-row items-center gap-1 md:gap-3"
               style={{ color: "rgba(255,255,255,0.25)" }}
             >
-              {footerData.bottom}
-            </p>
+              <span>{footerData.bottom}</span>
+              <a
+                href="/privacidade"
+                className="transition-colors duration-300"
+                style={{ color: "rgba(255,255,255,0.45)" }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "#ffffff";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "rgba(255,255,255,0.45)";
+                }}
+              >
+                Política de Privacidade e Cookies
+              </a>
+            </div>
 
             <div className="flex items-center gap-6">
               <span

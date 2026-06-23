@@ -89,7 +89,8 @@ export const metadata: Metadata = {
     google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || undefined,
     other: {
       "facebook-domain-verification":
-        process.env.NEXT_PUBLIC_FB_VERIFICATION || "",
+        process.env.NEXT_PUBLIC_FB_VERIFICATION ||
+        "lwhf7ybiszfajaeg80smbohhoa30m9",
     },
   },
 };

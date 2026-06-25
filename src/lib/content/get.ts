@@ -9,9 +9,13 @@ import {
 import { defaultGlobal, pageDefaults } from "./defaults";
 
 export async function getGlobalContent(): Promise<GlobalContent> {
-  const row = await prisma.globalContent.findUnique({ where: { id: "global" } });
-  if (!row) return defaultGlobal;
+  // try/catch cobre também falha de conexão (ex.: DB indisponível no build/ISR):
+  // cai no conteúdo padrão em vez de derrubar a renderização da página.
   try {
+    const row = await prisma.globalContent.findUnique({
+      where: { id: "global" },
+    });
+    if (!row) return defaultGlobal;
     return GlobalSchema.parse(JSON.parse(row.data));
   } catch {
     return defaultGlobal;
@@ -21,10 +25,11 @@ export async function getGlobalContent(): Promise<GlobalContent> {
 export async function getPageContent<K extends PageKey>(
   key: K
 ): Promise<PageContentMap[K]> {
-  const row = await prisma.pageContent.findUnique({ where: { id: key } });
   const fallback = pageDefaults[key] as PageContentMap[K];
-  if (!row) return fallback;
+  // try/catch cobre também falha de conexão (ex.: DB indisponível no build/ISR).
   try {
+    const row = await prisma.pageContent.findUnique({ where: { id: key } });
+    if (!row) return fallback;
     const schema = pageSchemas[key];
     return schema.parse(JSON.parse(row.data)) as PageContentMap[K];
   } catch {

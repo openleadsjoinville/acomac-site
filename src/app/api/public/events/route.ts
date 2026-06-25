@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { PUBLIC_CACHE_HEADERS } from "@/lib/cache";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -22,5 +23,5 @@ export async function GET(req: NextRequest) {
       ? [{ featured: "desc" }, { date: "desc" }]
       : [{ featured: "desc" }, { date: "asc" }],
   });
-  return NextResponse.json(items, { headers: { "cache-control": "no-store" } });
+  return NextResponse.json(items, { headers: PUBLIC_CACHE_HEADERS });
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPageContent } from "@/lib/content/get";
 import { PAGE_KEYS, type PageKey } from "@/lib/content/schema";
+import { PUBLIC_CACHE_HEADERS } from "@/lib/cache";
 
 export async function GET(
   _req: Request,
@@ -11,7 +12,5 @@ export async function GET(
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
   const data = await getPageContent(key as PageKey);
-  return NextResponse.json(data, {
-    headers: { "cache-control": "no-store" },
-  });
+  return NextResponse.json(data, { headers: PUBLIC_CACHE_HEADERS });
 }

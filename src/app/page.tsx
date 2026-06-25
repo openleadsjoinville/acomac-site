@@ -12,7 +12,11 @@ import ContactSection from "@/components/ContactSection";
 import { getGlobalContent, getPageContent } from "@/lib/content/get";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+// ISR: HTML renderizado no servidor é cacheado no CDN e regenerado a cada 5 min
+// (e imediatamente quando o conteúdo "home"/"global" é salvo no admin — ver
+// revalidateHome em @/lib/revalidate). Assim bots como o facebookexternalhit são
+// servidos do cache em vez de invocarem a função a cada acesso.
+export const revalidate = 300;
 
 const localBusinessJsonLd = {
   "@context": "https://schema.org",

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/slug";
+import { revalidateEventos } from "@/lib/revalidate";
 
 export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const g = await requireAdmin();
@@ -18,6 +19,7 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
   if ("date" in body && body.date) data.date = new Date(body.date);
   if ("endDate" in body) data.endDate = body.endDate ? new Date(body.endDate) : null;
   const item = await prisma.event.update({ where: { id }, data });
+  revalidateEventos();
   return NextResponse.json(item);
 }
 
@@ -26,5 +28,6 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
   if (g) return g;
   const { id } = await ctx.params;
   await prisma.event.delete({ where: { id } });
+  revalidateEventos();
   return NextResponse.json({ ok: true });
 }

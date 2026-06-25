@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { PUBLIC_CACHE_HEADERS } from "@/lib/cache";
 
 export async function GET() {
   const associates = await prisma.associate.findMany({
@@ -30,7 +31,5 @@ export async function GET() {
       facebook: true,
     },
   });
-  return NextResponse.json(associates, {
-    headers: { "cache-control": "no-store" },
-  });
+  return NextResponse.json(associates, { headers: PUBLIC_CACHE_HEADERS });
 }

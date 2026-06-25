@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/admin-guard";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/slug";
 import { autoExcerpt, autoReadTime } from "@/lib/blog-helpers";
+import { revalidateBlogPosts } from "@/lib/revalidate";
 
 async function ensureCategory(name: string) {
   if (!name?.trim()) return;
@@ -55,6 +56,7 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
     await ensureCategory(data.category);
   }
   const item = await prisma.blogPost.update({ where: { id }, data });
+  revalidateBlogPosts();
   return NextResponse.json(item);
 }
 
@@ -63,5 +65,6 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
   if (g) return g;
   const { id } = await ctx.params;
   await prisma.blogPost.delete({ where: { id } });
+  revalidateBlogPosts();
   return NextResponse.json({ ok: true });
 }

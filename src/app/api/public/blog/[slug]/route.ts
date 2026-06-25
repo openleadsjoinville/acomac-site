@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { PUBLIC_CACHE_HEADERS } from "@/lib/cache";
 
 export async function GET(
   _req: Request,
@@ -10,5 +11,5 @@ export async function GET(
   if (!post || !post.published) {
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
-  return NextResponse.json(post);
+  return NextResponse.json(post, { headers: PUBLIC_CACHE_HEADERS });
 }

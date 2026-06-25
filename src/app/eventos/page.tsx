@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import type { Event } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getPageContent } from "@/lib/content/get";
 import { EventosClient, type DBEvent } from "./eventos-client";
 import { buildPageMetadata } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+// ISR: cacheado no CDN, regenerado a cada 5 min e na hora em que um evento é
+// criado/editado/removido no admin (ver revalidateEventos em @/lib/revalidate).
+export const revalidate = 300;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Eventos da ACOMAC — FENAC, Rodadas de Negócios e Networking",
@@ -55,10 +58,14 @@ function toDBEvent(e: {
 export default async function EventosPage() {
   const [page, events] = await Promise.all([
     getPageContent("eventos"),
-    prisma.event.findMany({
-      where: { published: true },
-      orderBy: [{ featured: "desc" }, { date: "asc" }],
-    }),
+    // .catch([]) evita quebrar o build/ISR se o DB estiver indisponível na hora
+    // da pré-renderização; o ISR regenera com os dados reais no próximo ciclo.
+    prisma.event
+      .findMany({
+        where: { published: true },
+        orderBy: [{ featured: "desc" }, { date: "asc" }],
+      })
+      .catch(() => [] as Event[]),
   ]);
 
   const now = new Date();

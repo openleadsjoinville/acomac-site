@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/slug";
+import { revalidateEventos } from "@/lib/revalidate";
 
 export async function GET() {
   const g = await requireAdmin();
@@ -38,5 +39,6 @@ export async function POST(req: Request) {
       orderIndex: Number(body.orderIndex ?? 0),
     },
   });
+  revalidateEventos();
   return NextResponse.json(item);
 }

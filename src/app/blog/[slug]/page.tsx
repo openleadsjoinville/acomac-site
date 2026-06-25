@@ -5,7 +5,11 @@ import ClientSiteChrome from "@/components/ClientSiteChrome";
 import BlogPostView from "@/components/public/BlogPostView";
 import { buildPageMetadata, SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+// ISR: cada post é gerado sob demanda no primeiro acesso, cacheado no CDN e
+// revalidado a cada 5 min e na hora em que o post é editado/removido no admin
+// (ver revalidateBlogPosts em @/lib/revalidate). Sem generateStaticParams,
+// nenhum slug é pré-renderizado no build (dynamicParams = true por padrão).
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,

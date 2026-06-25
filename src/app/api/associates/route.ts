@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { renderEmail, sendEmail } from "@/lib/email";
 
 const RegisterSchema = z.object({
   companyName: z.string().min(2, "Nome obrigatório"),
@@ -67,6 +68,27 @@ export async function POST(req: Request) {
       logoUrl: data.logoUrl || null,
       status: "PENDING",
     },
+  });
+  // Notificação por e-mail (best-effort — nunca quebra a resposta ao usuário).
+  await sendEmail({
+    subject: `Novo cadastro de associado: ${data.companyName}`,
+    replyTo: data.email,
+    html: renderEmail("Novo cadastro de associado (aguardando aprovação)", [
+      { label: "Empresa", value: data.companyName },
+      { label: "CNPJ", value: data.cnpj },
+      { label: "Contato", value: data.contactName },
+      { label: "E-mail", value: data.email },
+      { label: "Telefone", value: data.phone },
+      { label: "WhatsApp", value: data.whatsapp },
+      {
+        label: "Localização",
+        value: [data.neighborhood, data.city, data.state]
+          .filter(Boolean)
+          .join(", "),
+      },
+      { label: "Segmento", value: data.segment },
+      { label: "Site", value: data.website },
+    ]),
   });
   return NextResponse.json({ ok: true, id: record.id });
 }

@@ -20,6 +20,7 @@ import {
   Search,
   GraduationCap,
   CheckCircle2,
+  History,
 } from "lucide-react";
 import ClientSiteChrome from "@/components/ClientSiteChrome";
 import SponsorAside from "@/components/public/SponsorAside";
@@ -40,12 +41,28 @@ type DBCourse = {
   image: string;
   ctaLabel?: string;
   ctaHref?: string;
+  startDate?: string | null;
+  endDate?: string | null;
 };
 
 const COURSE_ICONS = [Paintbrush, Wrench, Zap, HardHat, ShoppingCart, UserCog, Forklift, GraduationCap];
 
 function autoCourseMessage(title: string): string {
   return `Olá! Tenho interesse no curso "${title}" da ACOMAC. Gostaria de receber mais informações sobre datas, valores e como me inscrever.`;
+}
+
+function proximaTurmaMessage(title: string): string {
+  return `Olá! Vi que o curso "${title}" da ACOMAC já foi realizado. Gostaria de ser avisado quando abrir uma nova turma.`;
+}
+
+/** "julho de 2026" — usado nas turmas já encerradas */
+function mesAno(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return new Intl.DateTimeFormat("pt-BR", {
+    month: "long",
+    year: "numeric",
+  }).format(d);
 }
 
 type Categoria = string;
@@ -61,6 +78,10 @@ type Curso = {
   turma?: string;
   ctaMessage?: string;
   ctaWhatsapp?: string;
+  /** Turma já encerrada: data em que aconteceu, em ms (para ordenar) */
+  encerradoEm?: number;
+  /** "julho de 2026" */
+  encerradoLabel?: string;
 };
 
 const info = [
@@ -92,44 +113,76 @@ const info = [
 export default function CursosPage() {
   const page = usePageContent("cursos");
   const hero = page?.hero;
-  const dbCourses = useCollection<DBCourse>("/api/public/courses");
+  // ?all=1 traz também as turmas encerradas, separadas mais abaixo no histórico
+  const dbCourses = useCollection<DBCourse>("/api/public/courses?all=1");
   const [categoria, setCategoria] = useState<Categoria>("todos");
   const [busca, setBusca] = useState("");
 
   const { ref: heroRef, inView: heroInView } = useInView(0.12);
   const { ref: gridRef, inView: gridInView } = useInView(0.05);
   const { ref: infoRef, inView: infoInView } = useInView(0.15);
+  const { ref: histRef, inView: histInView } = useInView(0.05);
 
   // Fonte única: cursos publicados no painel admin. Nada de conteúdo fictício —
   // se não houver curso publicado, a página mostra o estado vazio.
   const carregando = dbCourses === null;
-  const cursosSrc: Curso[] = (dbCourses ?? []).map((c, i) => ({
-    icon: COURSE_ICONS[i % COURSE_ICONS.length] as typeof Paintbrush,
-    title: c.title,
-    description: c.description,
-    duration: c.duration || "—",
-    category: c.category || "Geral",
-    level:
-      c.level === "Intermediário" || c.level === "Avançado"
-        ? (c.level as Curso["level"])
-        : "Básico",
-    image: c.image,
-    turma: c.price || undefined,
-    ctaMessage: c.ctaLabel || autoCourseMessage(c.title),
-    ctaWhatsapp: c.ctaHref || "",
-  }));
+
+  const { cursosSrc, encerrados } = useMemo(() => {
+    const agora = Date.now();
+    const abertos: Curso[] = [];
+    const passados: Curso[] = [];
+
+    (dbCourses ?? []).forEach((c, i) => {
+      const fim = c.endDate ? new Date(c.endDate).getTime() : null;
+      const jaEncerrou = fim !== null && !Number.isNaN(fim) && fim < agora;
+      // Data mostrada no histórico: preferimos o início da turma; sem ele, o fim
+      const refData = c.startDate ?? c.endDate ?? null;
+
+      const base: Curso = {
+        icon: COURSE_ICONS[i % COURSE_ICONS.length] as typeof Paintbrush,
+        title: c.title,
+        description: c.description,
+        duration: c.duration || "—",
+        category: c.category || "Geral",
+        level:
+          c.level === "Intermediário" || c.level === "Avançado"
+            ? (c.level as Curso["level"])
+            : "Básico",
+        image: c.image,
+        turma: c.price || undefined,
+        ctaMessage: c.ctaLabel || autoCourseMessage(c.title),
+        ctaWhatsapp: c.ctaHref || "",
+      };
+
+      if (jaEncerrou) {
+        passados.push({
+          ...base,
+          ctaMessage: proximaTurmaMessage(c.title),
+          encerradoEm: fim ?? 0,
+          encerradoLabel: refData ? mesAno(refData) : undefined,
+        });
+      } else {
+        abertos.push(base);
+      }
+    });
+
+    // Histórico do mais recente para o mais antigo
+    passados.sort((a, b) => (b.encerradoEm ?? 0) - (a.encerradoEm ?? 0));
+
+    return { cursosSrc: abertos, encerrados: passados };
+  }, [dbCourses]);
 
   // Categorias dinâmicas: geradas das categorias reais dos cursos + "Todos"
   const filtrosDinamicos: { key: Categoria; label: string }[] = [
     { key: "todos", label: "Todos" },
-    ...Array.from(new Set(cursosSrc.map((c) => c.category)))
+    ...Array.from(new Set([...cursosSrc, ...encerrados].map((c) => c.category)))
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b))
       .map((c) => ({ key: c, label: c })),
   ];
 
-  const lista = useMemo(() => {
-    return cursosSrc.filter((c) => {
+  const filtrar = (arr: Curso[]) =>
+    arr.filter((c) => {
       const matchCat = categoria === "todos" || c.category === categoria;
       const termo = busca.trim().toLowerCase();
       const matchBusca =
@@ -138,7 +191,17 @@ export default function CursosPage() {
         c.description.toLowerCase().includes(termo);
       return matchCat && matchBusca;
     });
-  }, [categoria, busca, cursosSrc]);
+
+  const lista = useMemo(
+    () => filtrar(cursosSrc),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [categoria, busca, cursosSrc]
+  );
+  const listaEncerrados = useMemo(
+    () => filtrar(encerrados),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [categoria, busca, encerrados]
+  );
 
   return (
     <>
@@ -233,7 +296,7 @@ export default function CursosPage() {
         <section className="py-20 bg-white">
           <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 xl:grid-cols-[1fr_260px] gap-12">
             <div className="min-w-0">
-            {cursosSrc.length > 0 && (
+            {cursosSrc.length + encerrados.length > 0 && (
               <>
             <div className="relative max-w-xl mb-8">
               <Search
@@ -430,8 +493,9 @@ export default function CursosPage() {
                       Nenhuma turma aberta no momento
                     </p>
                     <p className="text-sm mb-6" style={{ color: "#777" }}>
-                      Estamos preparando o próximo calendário de cursos. Fale com a
-                      equipe para saber das próximas turmas e entrar na lista de espera.
+                      {encerrados.length > 0
+                        ? "As turmas já realizadas estão logo abaixo. Estamos montando o próximo calendário — fale com a equipe para entrar na lista de espera."
+                        : "Estamos preparando o próximo calendário de cursos. Fale com a equipe para saber das próximas turmas e entrar na lista de espera."}
                     </p>
                     <a
                       href={whatsappLink(
@@ -451,9 +515,149 @@ export default function CursosPage() {
                   </>
                 ) : (
                   <p className="text-sm" style={{ color: "#777" }}>
-                    Nenhum curso encontrado com esse filtro.
+                    {listaEncerrados.length > 0
+                      ? "Nenhuma turma aberta com esse filtro — veja abaixo as que já foram realizadas."
+                      : "Nenhum curso encontrado com esse filtro."}
                   </p>
                 )}
+              </div>
+            )}
+
+            {/* HISTÓRICO — turmas que já aconteceram */}
+            {!carregando && listaEncerrados.length > 0 && (
+              <div
+                ref={histRef}
+                className={cursosSrc.length > 0 ? "mt-20" : "mt-16"}
+              >
+                <div
+                  className="pt-10"
+                  style={{ borderTop: "1px solid #eee" }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <History size={15} style={{ color: "#888" }} />
+                    <span
+                      className="text-[11px] font-bold uppercase tracking-[0.2em]"
+                      style={{ color: "#888" }}
+                    >
+                      Já realizados
+                    </span>
+                  </div>
+                  <h2
+                    className="text-2xl md:text-3xl font-extrabold tracking-tight mb-2"
+                    style={{ color: "#111" }}
+                  >
+                    Turmas que já aconteceram
+                  </h2>
+                  <p className="text-sm max-w-2xl mb-8" style={{ color: "#666" }}>
+                    Estes cursos <strong>já foram encerrados</strong> e não estão com
+                    inscrições abertas. Ficam aqui como registro do que a Academia da
+                    Construção realizou — se algum te interessa, avise a equipe e você
+                    entra na lista da próxima turma.
+                  </p>
+
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {listaEncerrados.map((c, i) => {
+                      const Icon = c.icon;
+                      const num = c.ctaWhatsapp?.replace(/\D/g, "") || "5547991103681";
+                      return (
+                        <article
+                          key={`${c.title}-${i}`}
+                          className="group rounded-2xl overflow-hidden flex flex-col"
+                          style={{
+                            ...staggerStyle(histInView, i, 0.04),
+                            backgroundColor: "#fafafa",
+                            border: "1px solid #ececec",
+                          }}
+                        >
+                          <div className="relative w-full aspect-[16/9] overflow-hidden bg-gray-100">
+                            <Image
+                              src={c.image}
+                              alt={c.title}
+                              fill
+                              sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw"
+                              className="object-cover transition-all duration-500"
+                              style={{ filter: "grayscale(1)", opacity: 0.55 }}
+                              unoptimized
+                            />
+                            <span
+                              className="absolute top-3 left-3 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full"
+                              style={{
+                                backgroundColor: "rgba(17,17,17,0.82)",
+                                color: "#fff",
+                              }}
+                            >
+                              <CheckCircle2 size={11} />
+                              Turma encerrada
+                            </span>
+                          </div>
+
+                          <div className="p-5 flex flex-col flex-1">
+                            <div className="flex items-center gap-2.5 mb-2">
+                              <div
+                                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                                style={{ backgroundColor: "rgba(0,0,0,0.05)" }}
+                              >
+                                <Icon size={15} style={{ color: "#777" }} />
+                              </div>
+                              <h3
+                                className="text-[15px] font-extrabold leading-tight"
+                                style={{ color: "#333" }}
+                              >
+                                {c.title}
+                              </h3>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-3">
+                              {c.encerradoLabel && (
+                                <span
+                                  className="inline-flex items-center gap-1.5 text-[12px] font-semibold"
+                                  style={{ color: "#777" }}
+                                >
+                                  <CalendarDays size={12} />
+                                  Realizado em {c.encerradoLabel}
+                                </span>
+                              )}
+                              <span
+                                className="inline-flex items-center gap-1.5 text-[12px]"
+                                style={{ color: "#999" }}
+                              >
+                                <Clock size={12} />
+                                {c.duration}
+                              </span>
+                            </div>
+
+                            <p
+                              className="text-[13px] leading-relaxed mb-4 flex-1"
+                              style={{ color: "#777" }}
+                            >
+                              {c.description}
+                            </p>
+
+                            <a
+                              href={whatsappLink(
+                                num,
+                                c.ctaMessage || proximaTurmaMessage(c.title)
+                              )}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              data-track="cursos_whatsapp_click"
+                              data-track-label={`encerrado:${c.title}`}
+                              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-300"
+                              style={{
+                                backgroundColor: "#fff",
+                                color: "#0059AB",
+                                border: "1px solid #d8e3f0",
+                              }}
+                            >
+                              Avise-me da próxima turma
+                              <ArrowRight size={14} />
+                            </a>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             )}
             </div>

@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { useInView, useCountUp, fadeIn, staggerStyle } from "@/hooks/useAnimations";
 
-type Category = "todos" | "tecnico" | "gestao" | "seguranca" | "vendas";
+type Category = string;
 
 interface Course {
   icon: React.ComponentType<{ size?: number; style?: React.CSSProperties; strokeWidth?: number }>;
@@ -33,105 +33,15 @@ interface Course {
   ctaWhatsapp?: string;
 }
 
-const categories: { key: Category; label: string }[] = [
-  { key: "todos", label: "Todos" },
-  { key: "tecnico", label: "Técnicos" },
-  { key: "gestao", label: "Gestão" },
-  { key: "vendas", label: "Vendas" },
-  { key: "seguranca", label: "Segurança" },
-];
-
-const courses: Course[] = [
-  {
-    icon: Paintbrush,
-    title: "Pintura Residencial",
-    description: "Técnicas profissionais de pintura interna e externa com acabamento de qualidade.",
-    duration: "40h",
-    category: "tecnico",
-    level: "Básico",
-    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=600&h=400&fit=crop",
-  },
-  {
-    icon: Wrench,
-    title: "Hidráulica e Encanamento",
-    description: "Instalações hidráulicas residenciais e comerciais conforme normas.",
-    duration: "60h",
-    category: "tecnico",
-    level: "Intermediário",
-    image: "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=600&h=400&fit=crop",
-  },
-  {
-    icon: Zap,
-    title: "Elétrica Predial",
-    description: "Instalações elétricas prediais seguindo todas as normas técnicas de segurança.",
-    duration: "80h",
-    category: "tecnico",
-    level: "Intermediário",
-    image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=600&h=400&fit=crop",
-  },
-  {
-    icon: HardHat,
-    title: "Assentamento de Pisos",
-    description: "Colocação profissional de pisos cerâmicos, porcelanatos e revestimentos.",
-    duration: "40h",
-    category: "tecnico",
-    level: "Básico",
-    image: "https://images.unsplash.com/photo-1615971677499-5467cbab01c0?w=600&h=400&fit=crop",
-  },
-  {
-    icon: ShoppingCart,
-    title: "Técnicas de Vendas",
-    description: "Estratégias de vendas consultivas para o varejo da construção civil.",
-    duration: "24h",
-    category: "vendas",
-    level: "Básico",
-    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop",
-  },
-  {
-    icon: UserCog,
-    title: "Gestão de Loja",
-    description: "Administração eficiente de lojas de materiais de construção.",
-    duration: "32h",
-    category: "gestao",
-    level: "Avançado",
-    image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&h=400&fit=crop",
-  },
-  {
-    icon: Users,
-    title: "Liderança e RH",
-    description: "Gestão de equipes e desenvolvimento de líderes no setor de materiais.",
-    duration: "24h",
-    category: "gestao",
-    level: "Intermediário",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop",
-  },
-  {
-    icon: Forklift,
-    title: "Operador de Empilhadeira",
-    description: "Certificação NR-11 para operação segura de empilhadeiras e transpaleteiras.",
-    duration: "16h",
-    category: "seguranca",
-    level: "Básico",
-    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&h=400&fit=crop",
-  },
-  {
-    icon: HardHat,
-    title: "NR-35 Trabalho em Altura",
-    description: "Capacitação obrigatória para trabalhos acima de 2 metros de altura.",
-    duration: "8h",
-    category: "seguranca",
-    level: "Básico",
-    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&h=400&fit=crop",
-  },
-  {
-    icon: ShoppingCart,
-    title: "Negociação com Fornecedores",
-    description: "Técnicas avançadas de negociação e gestão de compras para o varejo.",
-    duration: "16h",
-    category: "vendas",
-    level: "Avançado",
-    image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&h=400&fit=crop",
-  },
+const COURSE_ICONS: Course["icon"][] = [
+  Paintbrush,
+  Wrench,
+  Zap,
+  HardHat,
+  ShoppingCart,
+  UserCog,
+  Users,
+  Forklift,
 ];
 
 const stats = [
@@ -188,26 +98,29 @@ export default function CoursesSection({
   const count2 = useCountUp(stats[2].end, 2000, statsInView);
   const counts = [count0, count1, count2];
 
-  const courseList: Course[] =
-    dbCourses && dbCourses.length > 0
-      ? dbCourses.map((c, i) => ({
-          icon: ([Paintbrush, Wrench, Zap, HardHat, ShoppingCart, UserCog, Users, Forklift] as Course["icon"][])[
-            i % 8
-          ],
-          title: c.title,
-          description: c.description,
-          duration: c.duration || "—",
-          category: "todos" as Category,
-          level: c.level || "Básico",
-          image: c.image,
-          ctaMessage: c.ctaLabel || autoCourseMessage(c.title),
-          ctaWhatsapp: c.ctaHref || globalWa,
-        }))
-      : courses.map((c) => ({
-          ...c,
-          ctaMessage: autoCourseMessage(c.title),
-          ctaWhatsapp: globalWa,
-        }));
+  // Fonte única: cursos publicados no painel admin. Sem fallback fictício —
+  // o carrossel só mostra o que existe de verdade no catálogo.
+  const carregando = dbCourses === null;
+  const courseList: Course[] = (dbCourses ?? []).map((c, i) => ({
+    icon: COURSE_ICONS[i % COURSE_ICONS.length],
+    title: c.title,
+    description: c.description,
+    duration: c.duration || "—",
+    category: c.category || "Geral",
+    level: c.level || "Básico",
+    image: c.image,
+    ctaMessage: c.ctaLabel || autoCourseMessage(c.title),
+    ctaWhatsapp: c.ctaHref || globalWa,
+  }));
+
+  // Trilhas geradas a partir das categorias reais dos cursos publicados
+  const categories: { key: Category; label: string }[] = [
+    { key: "todos", label: "Todos" },
+    ...Array.from(new Set(courseList.map((c) => c.category)))
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .map((c) => ({ key: c, label: c })),
+  ];
 
   const filtered =
     activeFilter === "todos"
@@ -308,7 +221,7 @@ export default function CoursesSection({
         >
           {/* Filter pills */}
           <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => {
+            {(categories.length > 2 ? categories : []).map((cat) => {
               const isActive = activeFilter === cat.key;
               return (
                 <button
@@ -337,7 +250,10 @@ export default function CoursesSection({
           </div>
 
           {/* Carousel arrows */}
-          <div className="flex gap-2 shrink-0">
+          <div
+            className="flex gap-2 shrink-0"
+            style={{ display: courseList.length > 1 ? undefined : "none" }}
+          >
             <button
               onClick={() => scroll("left")}
               className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
@@ -518,6 +434,40 @@ export default function CoursesSection({
             );
           })}
         </div>
+
+        {/* Sem cursos publicados: nada de card fictício, só um aviso honesto */}
+        {!carregando && courseList.length === 0 && (
+          <div
+            className="rounded-2xl p-10 text-center"
+            style={{ backgroundColor: "#fafafa", border: "1px dashed #e0e0e0" }}
+          >
+            <p className="text-[15px] font-bold mb-1.5" style={{ color: "#333" }}>
+              Nenhuma turma aberta no momento
+            </p>
+            <p className="text-sm" style={{ color: "#777" }}>
+              O próximo calendário de cursos está sendo montado. Fale com a equipe
+              para entrar na lista de espera.
+            </p>
+          </div>
+        )}
+
+        {carregando && (
+          <div className="flex gap-5 overflow-hidden">
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="shrink-0 w-[280px] md:w-[300px] rounded-2xl overflow-hidden animate-pulse"
+                style={{ border: "1px solid #e5e5e5" }}
+              >
+                <div className="h-44" style={{ backgroundColor: "#f0f0f0" }} />
+                <div className="p-5 space-y-3">
+                  <div className="h-4 rounded" style={{ backgroundColor: "#f0f0f0" }} />
+                  <div className="h-3 rounded w-4/5" style={{ backgroundColor: "#f5f5f5" }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Hide scrollbar via CSS-in-JS */}
         <style>{`

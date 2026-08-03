@@ -59,130 +59,9 @@ type Curso = {
   level: "Básico" | "Intermediário" | "Avançado";
   image: string;
   turma?: string;
+  ctaMessage?: string;
+  ctaWhatsapp?: string;
 };
-
-const IMG = "?w=800&h=600&fit=crop&q=80&auto=format";
-
-const cursos: Curso[] = [
-  {
-    icon: Paintbrush,
-    title: "Pintura Residencial",
-    description:
-      "Técnicas profissionais de pintura interna e externa com acabamento de qualidade, preparo de superfícies e escolha de produtos.",
-    duration: "40h",
-    category: "tecnico",
-    level: "Básico",
-    image: `https://images.unsplash.com/photo-1589939705384-5185137a7f0f${IMG}`,
-    turma: "Próxima turma: Março/2026",
-  },
-  {
-    icon: Wrench,
-    title: "Hidráulica e Encanamento",
-    description:
-      "Instalações hidráulicas residenciais e comerciais conforme normas ABNT, soldas e testes de estanqueidade.",
-    duration: "60h",
-    category: "tecnico",
-    level: "Intermediário",
-    image: `https://images.unsplash.com/photo-1585704032915-c3400ca199e7${IMG}`,
-    turma: "Próxima turma: Abril/2026",
-  },
-  {
-    icon: Zap,
-    title: "Elétrica Predial",
-    description:
-      "Instalações elétricas prediais seguindo todas as normas técnicas de segurança, quadros, circuitos e aterramento.",
-    duration: "80h",
-    category: "tecnico",
-    level: "Intermediário",
-    image: `https://images.unsplash.com/photo-1621905251189-08b45d6a269e${IMG}`,
-    turma: "Próxima turma: Maio/2026",
-  },
-  {
-    icon: HardHat,
-    title: "Assentamento de Pisos",
-    description:
-      "Colocação profissional de pisos cerâmicos, porcelanatos e revestimentos com preparo de contrapiso e rejuntamento.",
-    duration: "40h",
-    category: "tecnico",
-    level: "Básico",
-    image: `https://images.unsplash.com/photo-1615971677499-5467cbab01c0${IMG}`,
-    turma: "Próxima turma: Março/2026",
-  },
-  {
-    icon: ShoppingCart,
-    title: "Técnicas de Vendas",
-    description:
-      "Estratégias de vendas consultivas para o varejo da construção civil, atendimento e fechamento de negócios.",
-    duration: "24h",
-    category: "vendas",
-    level: "Básico",
-    image: `https://images.unsplash.com/photo-1556742049-0cfed4f6a45d${IMG}`,
-    turma: "Próxima turma: Abril/2026",
-  },
-  {
-    icon: UserCog,
-    title: "Gestão de Loja",
-    description:
-      "Administração eficiente de lojas de materiais de construção: estoque, compras, indicadores e rentabilidade.",
-    duration: "32h",
-    category: "gestao",
-    level: "Avançado",
-    image: `https://images.unsplash.com/photo-1542744173-8e7e53415bb0${IMG}`,
-    turma: "Próxima turma: Maio/2026",
-  },
-  {
-    icon: Users,
-    title: "Liderança e RH",
-    description:
-      "Gestão de equipes e desenvolvimento de líderes no setor de materiais, clima organizacional e feedback.",
-    duration: "24h",
-    category: "gestao",
-    level: "Intermediário",
-    image: `https://images.unsplash.com/photo-1552664730-d307ca884978${IMG}`,
-    turma: "Próxima turma: Junho/2026",
-  },
-  {
-    icon: Forklift,
-    title: "Operador de Empilhadeira",
-    description:
-      "Certificação NR-11 para operação segura de empilhadeiras e transpaleteiras, regras de circulação e manutenção.",
-    duration: "16h",
-    category: "seguranca",
-    level: "Básico",
-    image: `https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d${IMG}`,
-    turma: "Próxima turma: Março/2026",
-  },
-  {
-    icon: HardHat,
-    title: "NR-35 Trabalho em Altura",
-    description:
-      "Capacitação obrigatória para trabalhos acima de 2 metros de altura, EPIs e análise preliminar de riscos.",
-    duration: "8h",
-    category: "seguranca",
-    level: "Básico",
-    image: `https://images.unsplash.com/photo-1504307651254-35680f356dfd${IMG}`,
-    turma: "Turmas mensais",
-  },
-  {
-    icon: ShoppingCart,
-    title: "Negociação com Fornecedores",
-    description:
-      "Técnicas avançadas de negociação e gestão de compras para o varejo, condições comerciais e prazos.",
-    duration: "16h",
-    category: "vendas",
-    level: "Avançado",
-    image: `https://images.unsplash.com/photo-1450101499163-c8848c66ca85${IMG}`,
-    turma: "Próxima turma: Abril/2026",
-  },
-];
-
-const filtros: { key: Categoria; label: string }[] = [
-  { key: "todos", label: "Todos" },
-  { key: "tecnico", label: "Técnicos" },
-  { key: "gestao", label: "Gestão" },
-  { key: "vendas", label: "Vendas" },
-  { key: "seguranca", label: "Segurança" },
-];
 
 const info = [
   {
@@ -221,25 +100,24 @@ export default function CursosPage() {
   const { ref: gridRef, inView: gridInView } = useInView(0.05);
   const { ref: infoRef, inView: infoInView } = useInView(0.15);
 
-  // Fonte: DB quando há cursos publicados, fallback pros hardcoded (para dev sem seed)
-  const cursosSrc: (Curso & { ctaMessage?: string; ctaWhatsapp?: string })[] =
-    dbCourses && dbCourses.length > 0
-      ? dbCourses.map((c, i) => ({
-          icon: COURSE_ICONS[i % COURSE_ICONS.length] as typeof Paintbrush,
-          title: c.title,
-          description: c.description,
-          duration: c.duration || "—",
-          category: c.category || "Geral",
-          level:
-            c.level === "Intermediário" || c.level === "Avançado"
-              ? (c.level as Curso["level"])
-              : "Básico",
-          image: c.image,
-          turma: c.price || undefined,
-          ctaMessage: c.ctaLabel || autoCourseMessage(c.title),
-          ctaWhatsapp: c.ctaHref || "",
-        }))
-      : cursos;
+  // Fonte única: cursos publicados no painel admin. Nada de conteúdo fictício —
+  // se não houver curso publicado, a página mostra o estado vazio.
+  const carregando = dbCourses === null;
+  const cursosSrc: Curso[] = (dbCourses ?? []).map((c, i) => ({
+    icon: COURSE_ICONS[i % COURSE_ICONS.length] as typeof Paintbrush,
+    title: c.title,
+    description: c.description,
+    duration: c.duration || "—",
+    category: c.category || "Geral",
+    level:
+      c.level === "Intermediário" || c.level === "Avançado"
+        ? (c.level as Curso["level"])
+        : "Básico",
+    image: c.image,
+    turma: c.price || undefined,
+    ctaMessage: c.ctaLabel || autoCourseMessage(c.title),
+    ctaWhatsapp: c.ctaHref || "",
+  }));
 
   // Categorias dinâmicas: geradas das categorias reais dos cursos + "Todos"
   const filtrosDinamicos: { key: Categoria; label: string }[] = [
@@ -355,6 +233,8 @@ export default function CursosPage() {
         <section className="py-20 bg-white">
           <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 xl:grid-cols-[1fr_260px] gap-12">
             <div className="min-w-0">
+            {cursosSrc.length > 0 && (
+              <>
             <div className="relative max-w-xl mb-8">
               <Search
                 size={18}
@@ -405,6 +285,8 @@ export default function CursosPage() {
                 );
               })}
             </div>
+              </>
+            )}
 
             <div
               ref={gridRef}
@@ -510,17 +392,68 @@ export default function CursosPage() {
               })}
             </div>
 
-            {lista.length === 0 && (
+            {carregando && (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl overflow-hidden animate-pulse"
+                    style={{ border: "1px solid #eee" }}
+                  >
+                    <div className="w-full aspect-[4/3]" style={{ backgroundColor: "#f0f0f0" }} />
+                    <div className="p-6 space-y-3">
+                      <div className="h-4 rounded" style={{ backgroundColor: "#f0f0f0" }} />
+                      <div className="h-3 rounded w-4/5" style={{ backgroundColor: "#f5f5f5" }} />
+                      <div className="h-3 rounded w-3/5" style={{ backgroundColor: "#f5f5f5" }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!carregando && lista.length === 0 && (
               <div
-                className="mt-10 rounded-2xl p-12 text-center"
+                className="rounded-2xl p-12 text-center"
                 style={{
                   backgroundColor: "#fafafa",
                   border: "1px dashed #e0e0e0",
                 }}
               >
-                <p className="text-sm" style={{ color: "#777" }}>
-                  Nenhum curso encontrado com esse filtro.
-                </p>
+                {cursosSrc.length === 0 ? (
+                  <>
+                    <GraduationCap
+                      size={28}
+                      className="mx-auto mb-4"
+                      style={{ color: "#bbb" }}
+                    />
+                    <p className="text-base font-bold mb-1.5" style={{ color: "#333" }}>
+                      Nenhuma turma aberta no momento
+                    </p>
+                    <p className="text-sm mb-6" style={{ color: "#777" }}>
+                      Estamos preparando o próximo calendário de cursos. Fale com a
+                      equipe para saber das próximas turmas e entrar na lista de espera.
+                    </p>
+                    <a
+                      href={whatsappLink(
+                        "5547991103681",
+                        "Olá! Gostaria de saber quais cursos a ACOMAC vai oferecer nas próximas turmas."
+                      )}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-track="cursos_whatsapp_click"
+                      data-track-label="lista-vazia"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-[13px] font-bold"
+                      style={{ backgroundColor: "#0059AB", color: "#fff" }}
+                    >
+                      Falar com a equipe
+                      <ArrowRight size={14} />
+                    </a>
+                  </>
+                ) : (
+                  <p className="text-sm" style={{ color: "#777" }}>
+                    Nenhum curso encontrado com esse filtro.
+                  </p>
+                )}
               </div>
             )}
             </div>

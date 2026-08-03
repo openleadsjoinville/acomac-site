@@ -26,6 +26,8 @@ Site público em `http://localhost:3000`. Painel admin em `http://localhost:3000
 
 Senha admin padrão: definida em `.env` na variável `ADMIN_PASSWORD`.
 
+> **Proteção contra força bruta**: o login aceita no máximo **5 tentativas erradas a cada 15 minutos por IP**; ao estourar, aquele IP fica bloqueado por 15 minutos. O contador vive na tabela `LoginAttempt` (Postgres) e zera a cada login bem-sucedido. Ajuste os limites em `src/lib/login-rate-limit.ts`.
+
 ### Variáveis de ambiente (`.env`)
 
 ```env

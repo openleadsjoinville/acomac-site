@@ -182,6 +182,18 @@ model Sponsor {
   updatedAt   DateTime  @updatedAt
 }
 
+// ---------- Segurança do login admin ----------
+model LoginAttempt {
+  id          String    @id @default(cuid())
+  key         String    @unique // identificador do cliente (IP)
+  count       Int       @default(0)
+  firstAt     DateTime  @default(now())
+  lastAt      DateTime  @default(now())
+  lockedUntil DateTime?
+
+  @@index([lockedUntil])
+}
+
 // ---------- Analytics ----------
 model AnalyticsEvent {
   id        String   @id @default(cuid())

@@ -409,13 +409,6 @@ export default function CursosPage() {
                           {c.title}
                         </h3>
                       </div>
-                      <p
-                        className="text-sm leading-relaxed mb-5 flex-1"
-                        style={{ color: "#555" }}
-                      >
-                        {c.description}
-                      </p>
-
                       {c.turma && (
                         <div
                           className="flex items-center gap-1.5 text-[12px] mb-4"
@@ -440,7 +433,7 @@ export default function CursosPage() {
                         rel="noopener noreferrer"
                         data-track="cursos_whatsapp_click"
                         data-track-label={c.title}
-                        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-300"
+                        className="mt-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-300"
                         style={{
                           backgroundColor: "#0059AB",
                           color: "#fff",
@@ -464,10 +457,9 @@ export default function CursosPage() {
                     style={{ border: "1px solid #eee" }}
                   >
                     <div className="w-full aspect-[4/3]" style={{ backgroundColor: "#f0f0f0" }} />
-                    <div className="p-6 space-y-3">
-                      <div className="h-4 rounded" style={{ backgroundColor: "#f0f0f0" }} />
-                      <div className="h-3 rounded w-4/5" style={{ backgroundColor: "#f5f5f5" }} />
-                      <div className="h-3 rounded w-3/5" style={{ backgroundColor: "#f5f5f5" }} />
+                    <div className="p-6 space-y-4">
+                      <div className="h-4 rounded w-4/5" style={{ backgroundColor: "#f0f0f0" }} />
+                      <div className="h-10 rounded-xl" style={{ backgroundColor: "#f5f5f5" }} />
                     </div>
                   </div>
                 ))}
@@ -626,13 +618,6 @@ export default function CursosPage() {
                               </span>
                             </div>
 
-                            <p
-                              className="text-[13px] leading-relaxed mb-4 flex-1"
-                              style={{ color: "#777" }}
-                            >
-                              {c.description}
-                            </p>
-
                             <a
                               href={whatsappLink(
                                 num,
@@ -642,7 +627,7 @@ export default function CursosPage() {
                               rel="noopener noreferrer"
                               data-track="cursos_whatsapp_click"
                               data-track-label={`encerrado:${c.title}`}
-                              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-300"
+                              className="mt-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-300"
                               style={{
                                 backgroundColor: "#fff",
                                 color: "#0059AB",

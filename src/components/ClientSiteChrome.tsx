@@ -7,6 +7,7 @@ import WhatsAppButton from "./WhatsAppButton";
 import MobileBottomNav from "./MobileBottomNav";
 import MobileTopHeader from "./MobileTopHeader";
 import ExitPopup, { type ExitPopupConfig } from "./ExitPopup";
+import SalaoImovelPopup from "./SalaoImovelPopup";
 import type { GlobalContent, PageKey } from "@/lib/content/schema";
 
 const emptyExit: ExitPopupConfig = {
@@ -63,6 +64,7 @@ export default function ClientSiteChrome({
           "Olá! Vim pelo site e gostaria de mais informações."
         }
       />
+      <SalaoImovelPopup />
       {pageKey && (
         <ExitPopup config={exitPopup ?? emptyExit} pageKey={pageKey} />
       )}

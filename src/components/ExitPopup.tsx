@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { campanhaSalaoAtiva } from "./SalaoImovelPopup";
 
 export type ExitPopupConfig = {
   enabled: boolean;
@@ -18,6 +19,9 @@ export default function ExitPopup({ config, pageKey }: { config: ExitPopupConfig
 
   useEffect(() => {
     if (!config.enabled) return;
+    // Enquanto a campanha do Salão do Imóvel está no ar ela é o único pop-up:
+    // dois na mesma visita afastam mais do que convertem.
+    if (campanhaSalaoAtiva()) return;
     const storageKey = `acomac_exit_${pageKey}`;
     // Show only once per session
     const already = sessionStorage.getItem(storageKey);

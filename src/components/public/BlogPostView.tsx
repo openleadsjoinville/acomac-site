@@ -13,6 +13,7 @@ import {
   Check,
 } from "lucide-react";
 import { autoExcerpt, autoReadTime } from "@/lib/blog-helpers";
+import { renderRichText as renderContent } from "@/lib/rich-text";
 import { WhatsAppIcon } from "@/components/icons/SocialIcons";
 import SponsorAside from "./SponsorAside";
 
@@ -27,34 +28,6 @@ export type BlogPostData = {
   readTime?: string;
   publishedAt?: string | Date | null;
 };
-
-function renderContent(content: string): string {
-  if (!content) return "";
-  if (/<(p|h[1-6]|ul|ol|li|blockquote|pre|img|hr|div)\b/i.test(content)) {
-    return content;
-  }
-  const escape = (s: string) =>
-    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  return content
-    .split(/\n{2,}/)
-    .map((raw) => {
-      const b = raw.trim();
-      if (!b) return "";
-      if (b.startsWith("### ")) return `<h3>${escape(b.slice(4))}</h3>`;
-      if (b.startsWith("## ")) return `<h2>${escape(b.slice(3))}</h2>`;
-      if (b.startsWith("# ")) return `<h2>${escape(b.slice(2))}</h2>`;
-      if (/^-\s/.test(b)) {
-        const items = b
-          .split("\n")
-          .filter((l) => /^-\s/.test(l))
-          .map((l) => `<li>${escape(l.replace(/^-\s+/, ""))}</li>`)
-          .join("");
-        return `<ul>${items}</ul>`;
-      }
-      return `<p>${escape(b).replace(/\n/g, "<br/>")}</p>`;
-    })
-    .join("");
-}
 
 function ShareButtons({ title }: { title: string }) {
   const [copied, setCopied] = useState(false);

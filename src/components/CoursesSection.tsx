@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Paintbrush,
   Wrench,
@@ -23,14 +24,14 @@ type Category = string;
 
 interface Course {
   icon: React.ComponentType<{ size?: number; style?: React.CSSProperties; strokeWidth?: number }>;
+  slug: string;
   title: string;
-  description: string;
+  /** Resumo curto exibido no card — o texto completo fica na página do curso */
+  resumo: string;
   duration: string;
   category: Category;
   level: string;
   image: string;
-  ctaMessage?: string;
-  ctaWhatsapp?: string;
 }
 
 const COURSE_ICONS: Course["icon"][] = [
@@ -52,25 +53,18 @@ const stats = [
 
 import type { HomeContent } from "@/lib/content/schema";
 import { useCollection } from "@/hooks/useCollection";
-import { whatsappLink } from "@/lib/utils";
+import { resumo as resumir } from "@/lib/rich-text";
 
 type DBCourse = {
   id: string;
+  slug: string;
   title: string;
   description: string;
   category: string;
   duration: string;
   level: string;
   image: string;
-  ctaLabel?: string;
-  ctaHref?: string;
 };
-
-type GlobalLite = { whatsapp?: { number?: string } };
-
-function autoCourseMessage(title: string): string {
-  return `Olá! Tenho interesse no curso "${title}" da ACOMAC. Gostaria de receber mais informações sobre datas, valores e como me inscrever.`;
-}
 
 export default function CoursesSection({
   data,
@@ -78,14 +72,6 @@ export default function CoursesSection({
   data?: HomeContent["courses"];
 } = {}) {
   const dbCourses = useCollection<DBCourse>("/api/public/courses");
-  const [globalWa, setGlobalWa] = useState<string>("");
-
-  useEffect(() => {
-    fetch("/api/public/global")
-      .then((r) => r.json())
-      .then((g: GlobalLite) => setGlobalWa(g?.whatsapp?.number ?? ""))
-      .catch(() => {});
-  }, []);
   const [activeFilter, setActiveFilter] = useState<Category>("todos");
   const scrollRef = useRef<HTMLDivElement>(null);
   const { ref: headerRef, inView: headerInView } = useInView(0.15);
@@ -103,14 +89,14 @@ export default function CoursesSection({
   const carregando = dbCourses === null;
   const courseList: Course[] = (dbCourses ?? []).map((c, i) => ({
     icon: COURSE_ICONS[i % COURSE_ICONS.length],
+    slug: c.slug,
     title: c.title,
-    description: c.description,
+    // Card mostra só a chamada; o texto completo vive em /cursos/[slug]
+    resumo: resumir(c.description, 130),
     duration: c.duration || "—",
     category: c.category || "Geral",
     level: c.level || "Básico",
     image: c.image,
-    ctaMessage: c.ctaLabel || autoCourseMessage(c.title),
-    ctaWhatsapp: c.ctaHref || globalWa,
   }));
 
   // Trilhas geradas a partir das categorias reais dos cursos publicados
@@ -316,21 +302,12 @@ export default function CoursesSection({
             const level = levelColor(course.level);
             const isOrange = index % 2 !== 0;
             const accent = isOrange ? "#F6811E" : "#0059AB";
-            const accentBg = isOrange ? "#fff7ee" : "#eef4fd";
-            const waNumber = course.ctaWhatsapp || globalWa;
-            const waMessage =
-              course.ctaMessage || autoCourseMessage(course.title);
-            const waHref = waNumber
-              ? whatsappLink(waNumber, waMessage)
-              : "#contato";
 
             return (
-              <a
-                key={course.title}
-                href={waHref}
-                target={waHref.startsWith("http") ? "_blank" : undefined}
-                rel={waHref.startsWith("http") ? "noopener noreferrer" : undefined}
-                data-track="course_whatsapp_click"
+              <Link
+                key={course.slug || course.title}
+                href={`/cursos/${course.slug}`}
+                data-track="course_card_click"
                 data-track-label={course.title}
                 className="group snap-start shrink-0 w-[280px] md:w-[300px] rounded-2xl border overflow-hidden transition-all duration-400 block"
                 style={{
@@ -391,46 +368,58 @@ export default function CoursesSection({
                 </div>
 
                 {/* Card body */}
-                <div className="p-5">
+                <div className="p-5 flex flex-col">
                   <h4
                     className="text-[15px] font-bold mb-2"
                     style={{ color: "#111111" }}
                   >
                     {course.title}
                   </h4>
-                  <p
-                    className="text-sm leading-relaxed mb-4"
-                    style={{ color: "#777777" }}
-                  >
-                    {course.description}
-                  </p>
+                  {course.resumo && (
+                    <p
+                      className="text-sm leading-relaxed mb-4"
+                      style={{
+                        color: "#777777",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {course.resumo}
+                    </p>
+                  )}
 
                   {/* Meta row */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <span
-                        className="flex items-center gap-1.5 text-xs font-medium"
-                        style={{ color: "#999999" }}
-                      >
-                        <Clock size={12} />
-                        {course.duration}
-                      </span>
-                      <span
-                        className="flex items-center gap-1.5 text-xs font-medium"
-                        style={{ color: "#999999" }}
-                      >
-                        <Award size={12} />
-                        Certificado
-                      </span>
-                    </div>
-                    <ChevronRight
-                      size={16}
-                      className="transition-transform duration-200 group-hover:translate-x-1"
-                      style={{ color: accent }}
-                    />
+                  <div className="flex items-center gap-4 mb-4">
+                    <span
+                      className="flex items-center gap-1.5 text-xs font-medium"
+                      style={{ color: "#999999" }}
+                    >
+                      <Clock size={12} />
+                      {course.duration}
+                    </span>
+                    <span
+                      className="flex items-center gap-1.5 text-xs font-medium"
+                      style={{ color: "#999999" }}
+                    >
+                      <Award size={12} />
+                      Certificado
+                    </span>
                   </div>
+
+                  <span
+                    className="inline-flex items-center justify-center gap-1.5 w-full px-4 py-2.5 rounded-xl text-[13px] font-bold transition-colors duration-200"
+                    style={{ backgroundColor: accent, color: "#ffffff" }}
+                  >
+                    Saiba mais
+                    <ChevronRight
+                      size={14}
+                      className="transition-transform duration-200 group-hover:translate-x-0.5"
+                    />
+                  </span>
                 </div>
-              </a>
+              </Link>
             );
           })}
         </div>

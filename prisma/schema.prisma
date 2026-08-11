@@ -55,8 +55,13 @@ model Course {
   price       String   @default("")
   instructor  String   @default("")
   image       String   @default("")
-  ctaLabel    String   @default("")
-  ctaHref     String   @default("")
+  // Botão de inscrição: "whatsapp" abre a conversa com mensagem pronta,
+  // "link" manda para uma URL externa (Sympla, formulário, etc.)
+  ctaType            String @default("whatsapp") // whatsapp | link
+  ctaLabel           String @default("")         // rótulo do botão (ex: "Inscreva-se no Sympla")
+  ctaHref            String @default("")         // URL, quando ctaType = "link"
+  ctaWhatsappNumber  String @default("")         // número de destino, quando ctaType = "whatsapp"
+  ctaWhatsappMessage String @default("")         // mensagem que o interessado envia
   startDate   DateTime?
   endDate     DateTime?
   published   Boolean  @default(true)

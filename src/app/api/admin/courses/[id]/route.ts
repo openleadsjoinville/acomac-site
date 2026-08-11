@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/slug";
+import { revalidateCursos } from "@/lib/revalidate";
 
 export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const g = await requireAdmin();
@@ -9,8 +10,9 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
   const { id } = await ctx.params;
   const body = await req.json();
   const data: Record<string, unknown> = {};
-  const keys = ["title", "description", "content", "category", "duration", "level", "price", "instructor", "image", "ctaLabel", "ctaHref"] as const;
+  const keys = ["title", "description", "content", "category", "duration", "level", "price", "instructor", "image", "ctaLabel", "ctaHref", "ctaWhatsappNumber", "ctaWhatsappMessage"] as const;
   for (const k of keys) if (k in body) data[k] = body[k] ?? "";
+  if ("ctaType" in body) data.ctaType = body.ctaType === "link" ? "link" : "whatsapp";
   if ("slug" in body && body.slug) data.slug = slugify(body.slug);
   if ("featured" in body) data.featured = !!body.featured;
   if ("published" in body) data.published = !!body.published;
@@ -18,6 +20,7 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
   if ("startDate" in body) data.startDate = body.startDate ? new Date(body.startDate) : null;
   if ("endDate" in body) data.endDate = body.endDate ? new Date(body.endDate) : null;
   const item = await prisma.course.update({ where: { id }, data });
+  revalidateCursos();
   return NextResponse.json(item);
 }
 
@@ -26,5 +29,6 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
   if (g) return g;
   const { id } = await ctx.params;
   await prisma.course.delete({ where: { id } });
+  revalidateCursos();
   return NextResponse.json({ ok: true });
 }

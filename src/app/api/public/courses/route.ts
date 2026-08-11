@@ -20,6 +20,27 @@ export async function GET(req: NextRequest) {
             ],
           }),
     },
+    // Sem "content": os cards só mostram o resumo; a descrição completa é
+    // renderizada no servidor na página /cursos/[slug].
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      description: true,
+      category: true,
+      duration: true,
+      level: true,
+      price: true,
+      instructor: true,
+      image: true,
+      ctaType: true,
+      ctaLabel: true,
+      ctaHref: true,
+      ctaWhatsappNumber: true,
+      ctaWhatsappMessage: true,
+      startDate: true,
+      endDate: true,
+    },
     orderBy: [{ featured: "desc" }, { orderIndex: "asc" }],
   });
   return NextResponse.json(items, { headers: PUBLIC_CACHE_HEADERS });

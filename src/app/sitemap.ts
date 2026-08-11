@@ -69,11 +69,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // Cada curso tem página própria (/cursos/[slug]) com a descrição completa.
   const courseEntries: MetadataRoute.Sitemap = courses.map((c) => ({
-    url: `${SITE_URL}/cursos#${c.slug}`,
+    url: `${SITE_URL}/cursos/${c.slug}`,
     lastModified: c.updatedAt ?? now,
     changeFrequency: "weekly",
-    priority: 0.6,
+    priority: 0.7,
   }));
 
   return [...staticEntries, ...blogEntries, ...eventEntries, ...courseEntries];

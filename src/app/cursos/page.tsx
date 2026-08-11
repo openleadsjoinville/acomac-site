@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Paintbrush,
   Wrench,
@@ -28,6 +29,7 @@ import { usePageContent } from "@/hooks/usePageContent";
 import { useCollection } from "@/hooks/useCollection";
 import { useInView, fadeIn, staggerStyle } from "@/hooks/useAnimations";
 import { whatsappLink } from "@/lib/utils";
+import { resumo as resumir } from "@/lib/rich-text";
 
 type DBCourse = {
   id: string;
@@ -39,21 +41,11 @@ type DBCourse = {
   level: string;
   price: string;
   image: string;
-  ctaLabel?: string;
-  ctaHref?: string;
   startDate?: string | null;
   endDate?: string | null;
 };
 
 const COURSE_ICONS = [Paintbrush, Wrench, Zap, HardHat, ShoppingCart, UserCog, Forklift, GraduationCap];
-
-function autoCourseMessage(title: string): string {
-  return `Olá! Tenho interesse no curso "${title}" da ACOMAC. Gostaria de receber mais informações sobre datas, valores e como me inscrever.`;
-}
-
-function proximaTurmaMessage(title: string): string {
-  return `Olá! Vi que o curso "${title}" da ACOMAC já foi realizado. Gostaria de ser avisado quando abrir uma nova turma.`;
-}
 
 /** "julho de 2026" — usado nas turmas já encerradas */
 function mesAno(iso: string): string {
@@ -69,15 +61,17 @@ type Categoria = string;
 
 type Curso = {
   icon: typeof Paintbrush;
+  slug: string;
   title: string;
+  /** Texto cadastrado, usado na busca */
   description: string;
+  /** Versão curta exibida no card */
+  resumo: string;
   duration: string;
   category: string;
   level: "Básico" | "Intermediário" | "Avançado";
   image: string;
   turma?: string;
-  ctaMessage?: string;
-  ctaWhatsapp?: string;
   /** Turma já encerrada: data em que aconteceu, em ms (para ordenar) */
   encerradoEm?: number;
   /** "julho de 2026" */
@@ -140,8 +134,11 @@ export default function CursosPage() {
 
       const base: Curso = {
         icon: COURSE_ICONS[i % COURSE_ICONS.length] as typeof Paintbrush,
+        slug: c.slug,
         title: c.title,
         description: c.description,
+        // Card mostra a chamada curta; o texto completo fica em /cursos/[slug]
+        resumo: resumir(c.description, 150),
         duration: c.duration || "—",
         category: c.category || "Geral",
         level:
@@ -150,14 +147,11 @@ export default function CursosPage() {
             : "Básico",
         image: c.image,
         turma: c.price || undefined,
-        ctaMessage: c.ctaLabel || autoCourseMessage(c.title),
-        ctaWhatsapp: c.ctaHref || "",
       };
 
       if (jaEncerrou) {
         passados.push({
           ...base,
-          ctaMessage: proximaTurmaMessage(c.title),
           encerradoEm: fim ?? 0,
           encerradoLabel: refData ? mesAno(refData) : undefined,
         });
@@ -358,8 +352,11 @@ export default function CursosPage() {
               {lista.map((c, i) => {
                 const Icon = c.icon;
                 return (
-                  <article
-                    key={c.title}
+                  <Link
+                    key={c.slug || c.title}
+                    href={`/cursos/${c.slug}`}
+                    data-track="curso_card_click"
+                    data-track-label={c.title}
                     className="card-hover group rounded-2xl overflow-hidden flex flex-col"
                     style={{
                       ...staggerStyle(gridInView, i, 0.04),
@@ -411,7 +408,7 @@ export default function CursosPage() {
                       </div>
                       {c.turma && (
                         <div
-                          className="flex items-center gap-1.5 text-[12px] mb-4"
+                          className="flex items-center gap-1.5 text-[12px] mb-3"
                           style={{ color: "#F6811E" }}
                         >
                           <CalendarDays size={12} />
@@ -419,31 +416,36 @@ export default function CursosPage() {
                         </div>
                       )}
 
-                      <a
-                        href={(() => {
-                          const withCta = c as typeof c & { ctaWhatsapp?: string; ctaMessage?: string };
-                          if (withCta.ctaMessage) {
-                            const num = withCta.ctaWhatsapp?.replace(/\D/g, "");
-                            if (num) return whatsappLink(num, withCta.ctaMessage);
-                            return whatsappLink("5547991103681", withCta.ctaMessage);
-                          }
-                          return "/#contato";
-                        })()}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        data-track="cursos_whatsapp_click"
-                        data-track-label={c.title}
+                      {c.resumo && (
+                        <p
+                          className="text-[13px] leading-relaxed mb-4"
+                          style={{
+                            color: "#777",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                          }}
+                        >
+                          {c.resumo}
+                        </p>
+                      )}
+
+                      <span
                         className="mt-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-300"
                         style={{
                           backgroundColor: "#0059AB",
                           color: "#fff",
                         }}
                       >
-                        Quero me inscrever
-                        <ArrowRight size={14} />
-                      </a>
+                        Saiba mais
+                        <ArrowRight
+                          size={14}
+                          className="transition-transform duration-200 group-hover:translate-x-0.5"
+                        />
+                      </span>
                     </div>
-                  </article>
+                  </Link>
                 );
               })}
             </div>
@@ -550,10 +552,12 @@ export default function CursosPage() {
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {listaEncerrados.map((c, i) => {
                       const Icon = c.icon;
-                      const num = c.ctaWhatsapp?.replace(/\D/g, "") || "5547991103681";
                       return (
-                        <article
-                          key={`${c.title}-${i}`}
+                        <Link
+                          key={`${c.slug || c.title}-${i}`}
+                          href={`/cursos/${c.slug}`}
+                          data-track="curso_card_click"
+                          data-track-label={`encerrado:${c.title}`}
                           className="group rounded-2xl overflow-hidden flex flex-col"
                           style={{
                             ...staggerStyle(histInView, i, 0.04),
@@ -618,15 +622,7 @@ export default function CursosPage() {
                               </span>
                             </div>
 
-                            <a
-                              href={whatsappLink(
-                                num,
-                                c.ctaMessage || proximaTurmaMessage(c.title)
-                              )}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              data-track="cursos_whatsapp_click"
-                              data-track-label={`encerrado:${c.title}`}
+                            <span
                               className="mt-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-300"
                               style={{
                                 backgroundColor: "#fff",
@@ -634,11 +630,14 @@ export default function CursosPage() {
                                 border: "1px solid #d8e3f0",
                               }}
                             >
-                              Avise-me da próxima turma
-                              <ArrowRight size={14} />
-                            </a>
+                              Ver detalhes da turma
+                              <ArrowRight
+                                size={14}
+                                className="transition-transform duration-200 group-hover:translate-x-0.5"
+                              />
+                            </span>
                           </div>
-                        </article>
+                        </Link>
                       );
                     })}
                   </div>
@@ -753,7 +752,7 @@ export default function CursosPage() {
                   </p>
                 </div>
               </div>
-              <a
+              <Link
                 href="/#contato"
                 className="relative z-10 inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold shrink-0"
                 style={{
@@ -764,7 +763,7 @@ export default function CursosPage() {
               >
                 Falar com a equipe
                 <ArrowRight size={15} />
-              </a>
+              </Link>
             </div>
           </div>
         </section>

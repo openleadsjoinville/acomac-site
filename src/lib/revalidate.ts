@@ -16,6 +16,11 @@ export function revalidateEventos() {
   revalidatePath("/eventos");
 }
 
+// Todas as instâncias de /cursos/[slug] (página de detalhe do curso, ISR).
+export function revalidateCursos() {
+  revalidatePath("/cursos/[slug]", "page");
+}
+
 // Todas as instâncias de /blog/[slug] (posts renderizados no servidor).
 export function revalidateBlogPosts() {
   revalidatePath("/blog/[slug]", "page");

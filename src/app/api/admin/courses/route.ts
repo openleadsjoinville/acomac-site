@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/slug";
+import { revalidateCursos } from "@/lib/revalidate";
 
 export async function GET() {
   const g = await requireAdmin();
@@ -30,8 +31,11 @@ export async function POST(req: Request) {
       price: body.price ?? "",
       instructor: body.instructor ?? "",
       image: body.image ?? "",
+      ctaType: body.ctaType === "link" ? "link" : "whatsapp",
       ctaLabel: body.ctaLabel ?? "",
       ctaHref: body.ctaHref ?? "",
+      ctaWhatsappNumber: body.ctaWhatsappNumber ?? "",
+      ctaWhatsappMessage: body.ctaWhatsappMessage ?? "",
       startDate: body.startDate ? new Date(body.startDate) : null,
       endDate: body.endDate ? new Date(body.endDate) : null,
       published: body.published !== false,
@@ -39,5 +43,6 @@ export async function POST(req: Request) {
       orderIndex: Number(body.orderIndex ?? 0),
     },
   });
+  revalidateCursos();
   return NextResponse.json(item);
 }

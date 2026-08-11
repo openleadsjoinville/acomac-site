@@ -2,7 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, CalendarDays, MapPin, Ticket, X } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarDays,
+  CheckCircle2,
+  MapPin,
+  Ticket,
+  X,
+} from "lucide-react";
 
 /**
  * Pop-up de campanha do 3º Salão do Imóvel de Joinville, realizado pela ACOMAC.
@@ -15,8 +22,14 @@ import { ArrowRight, CalendarDays, MapPin, Ticket, X } from "lucide-react";
 const INICIO = Date.parse("2026-08-11T00:00:00-03:00");
 const FIM = Date.parse("2026-08-23T23:59:59-03:00");
 
-const STORAGE_KEY = "acomac_salao_popup_2026";
 const SITE_SALAO = "https://www.salaodoimoveljoinville.com.br/";
+
+/**
+ * Trava só em memória: some a cada carregamento do site, então o pop-up
+ * reaparece em toda visita nova (e em todo F5), mas não pisca de novo a cada
+ * clique no menu — navegar entre páginas não é "entrar no site outra vez".
+ */
+let jaAbriuNestaNavegacao = false;
 
 /** true enquanto a campanha estiver no ar — usado também para calar o exit popup */
 export function campanhaSalaoAtiva(): boolean {
@@ -67,23 +80,15 @@ export default function SalaoImovelPopup() {
 
   useEffect(() => {
     if (!campanhaSalaoAtiva()) return;
-    try {
-      if (sessionStorage.getItem(STORAGE_KEY)) return;
-    } catch {
-      /* sessionStorage indisponível: mostra assim mesmo */
-    }
+    if (jaAbriuNestaNavegacao) return;
 
     let cancelado = false;
     let timer: ReturnType<typeof setTimeout>;
 
     const abrir = () => {
       if (cancelado) return;
+      jaAbriuNestaNavegacao = true;
       setOpen(true);
-      try {
-        sessionStorage.setItem(STORAGE_KEY, "1");
-      } catch {
-        /* ignore */
-      }
       requestAnimationFrame(() => setEntrando(true));
     };
 
@@ -137,7 +142,7 @@ export default function SalaoImovelPopup() {
       aria-label="3º Salão do Imóvel de Joinville"
     >
       <div
-        className="relative w-full max-w-[960px] max-h-[92vh] overflow-y-auto rounded-3xl bg-white"
+        className="relative w-full max-w-[1040px] max-h-[92vh] overflow-y-auto rounded-3xl bg-white"
         style={{
           boxShadow: "0 30px 80px rgba(0,0,0,0.35)",
           transform: entrando ? "translateY(0) scale(1)" : "translateY(16px) scale(0.98)",
@@ -212,6 +217,25 @@ export default function SalaoImovelPopup() {
               </div>
             </div>
 
+            <ul className="space-y-2.5 mb-7">
+              {[
+                "Imóveis com condições abaixo da tabela",
+                "Construtoras, imobiliárias e bancos no mesmo lugar",
+                "Três dias de feira, com entrada gratuita",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2.5">
+                  <CheckCircle2
+                    size={16}
+                    className="shrink-0 mt-0.5"
+                    style={{ color: "#F6811E" }}
+                  />
+                  <span className="text-[14px] leading-snug" style={{ color: "#44505f" }}>
+                    {item}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
             <div className="mt-auto flex flex-wrap items-center gap-3">
               <a
                 href={SITE_SALAO}
@@ -260,23 +284,23 @@ export default function SalaoImovelPopup() {
               />
             </div>
 
-            <div className="space-y-3.5">
+            <div className="space-y-4">
               {GRUPOS.map((grupo, i) => (
                 <div key={grupo.titulo}>
                   <p
-                    className="text-[9px] font-bold uppercase tracking-[0.2em] mb-2"
+                    className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2"
                     style={{ color: "#b08b6a" }}
                   >
                     {grupo.titulo}
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2.5">
                     {grupo.logos.map((logo) => (
                       <div
                         key={logo.arquivo}
-                        className={`relative flex-1 rounded-lg bg-white ${
+                        className={`relative flex-1 rounded-xl bg-white ${
                           i === 0
-                            ? "h-16 min-w-[160px] max-w-[200px]"
-                            : "h-14 min-w-[90px] max-w-[136px]"
+                            ? "h-[104px] min-w-[220px]"
+                            : "h-[86px] min-w-[132px]"
                         }`}
                         style={{ border: "1px solid rgba(0,0,0,0.06)" }}
                         title={logo.nome}
@@ -285,8 +309,8 @@ export default function SalaoImovelPopup() {
                           src={`/salao-imovel/${logo.arquivo}`}
                           alt={logo.nome}
                           fill
-                          sizes="200px"
-                          className="object-contain p-1.5"
+                          sizes="260px"
+                          className="object-contain p-2.5"
                         />
                       </div>
                     ))}

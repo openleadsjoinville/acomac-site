@@ -67,14 +67,43 @@ export default function SalaoImovelPopup() {
 
   useEffect(() => {
     if (!campanhaSalaoAtiva()) return;
-    if (sessionStorage.getItem(STORAGE_KEY)) return;
+    try {
+      if (sessionStorage.getItem(STORAGE_KEY)) return;
+    } catch {
+      /* sessionStorage indisponível: mostra assim mesmo */
+    }
 
-    const t = setTimeout(() => {
+    let cancelado = false;
+    let timer: ReturnType<typeof setTimeout>;
+
+    const abrir = () => {
+      if (cancelado) return;
       setOpen(true);
-      sessionStorage.setItem(STORAGE_KEY, "1");
+      try {
+        sessionStorage.setItem(STORAGE_KEY, "1");
+      } catch {
+        /* ignore */
+      }
       requestAnimationFrame(() => setEntrando(true));
-    }, 1500);
-    return () => clearTimeout(t);
+    };
+
+    // Na home a vinheta de entrada (IntroVideo) cobre a tela — só aparecemos
+    // depois que ela sai, senão o pop-up atropela o vídeo.
+    const esperarIntro = (tentativas: number) => {
+      if (cancelado) return;
+      const introNaTela = document.querySelector(".acomac-intro");
+      if (introNaTela && tentativas < 75) {
+        timer = setTimeout(() => esperarIntro(tentativas + 1), 400);
+        return;
+      }
+      timer = setTimeout(abrir, introNaTela ? 0 : 1200);
+    };
+    esperarIntro(0);
+
+    return () => {
+      cancelado = true;
+      clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {

@@ -7,6 +7,7 @@ import MobileBottomNav from "./MobileBottomNav";
 import MobileTopHeader from "./MobileTopHeader";
 import IntroVideo from "./IntroVideo";
 import ExitPopup from "./ExitPopup";
+import SalaoImovelPopup from "./SalaoImovelPopup";
 
 export default async function SiteChrome({
   children,
@@ -34,6 +35,7 @@ export default async function SiteChrome({
         text={global.whatsapp.bubbleText}
         message={global.whatsapp.defaultMessage}
       />
+      <SalaoImovelPopup />
       {exitPopup && pageKey && (
         <ExitPopup config={exitPopup} pageKey={pageKey} />
       )}

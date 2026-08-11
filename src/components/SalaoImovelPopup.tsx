@@ -263,26 +263,19 @@ export default function SalaoImovelPopup() {
             </div>
           </div>
 
-          {/* Lado direito — arte + quem faz acontecer */}
+          {/* Lado direito — quem faz acontecer */}
           <div
-            className="p-6 sm:p-7 flex flex-col gap-5"
+            className="p-6 sm:p-7 flex flex-col justify-center gap-5"
             style={{
               background: "linear-gradient(160deg, #fff8f1 0%, #fdf1e4 100%)",
             }}
           >
-            <div
-              className="relative w-full aspect-[1200/630] rounded-2xl overflow-hidden"
-              style={{ boxShadow: "0 12px 32px rgba(0,0,0,0.18)" }}
+            <p
+              className="text-[13px] font-bold uppercase tracking-[0.12em]"
+              style={{ color: "#8a6a4d" }}
             >
-              <Image
-                src="/salao-imovel/banner-salao.png"
-                alt="3º Salão do Imóvel de Joinville — 21 a 23 de agosto de 2026"
-                fill
-                sizes="(min-width:768px) 440px, 100vw"
-                className="object-cover"
-                priority
-              />
-            </div>
+              Quem faz acontecer
+            </p>
 
             <div className="space-y-4">
               {GRUPOS.map((grupo, i) => (

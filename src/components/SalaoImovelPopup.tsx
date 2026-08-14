@@ -54,7 +54,7 @@ const GRUPOS: { titulo: string; logos: Logo[] }[] = [
   {
     titulo: "Patrocinadores",
     logos: [
-      { nome: "Caixa Econômica Federal", arquivo: "caixa.jpeg" },
+      { nome: "Caixa Econômica Federal", arquivo: "caixa.png" },
       { nome: "NORTHAUS", arquivo: "northaus.png" },
       { nome: "RÔGGA", arquivo: "rogga.png" },
     ],

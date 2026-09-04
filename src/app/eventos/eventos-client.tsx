@@ -9,6 +9,7 @@ import {
   Ticket,
   CalendarRange,
   History,
+  Film,
 } from "lucide-react";
 import ClientSiteChrome from "@/components/ClientSiteChrome";
 import SponsorAside from "@/components/public/SponsorAside";
@@ -94,6 +95,94 @@ const CTA_WHATSAPP = "5547991103681";
 const CTA_DEFAULT_MESSAGE =
   "Olá! Tenho interesse em participar dos eventos da ACOMAC.";
 
+/* ── Vídeos dos eventos ─────────────────────────────────── */
+
+type EventVideo = {
+  src: string;
+  poster: string;
+  title: string;
+  caption: string;
+  /** 9:16 (formato reels) em vez do 16:9 padrão. */
+  vertical?: boolean;
+};
+
+const EVENT_VIDEOS: EventVideo[] = [
+  {
+    src: "/videos/aftermovie-fenacom-2026.mp4",
+    poster: "/videos/aftermovie-fenacom-2026.jpg",
+    title: "Aftermovie FENACOM 2026",
+    caption: "Florianópolis · Retrospectiva oficial do encontro",
+  },
+  {
+    src: "/videos/aftermovie-fenacom-2026-sem-falas.mp4",
+    poster: "/videos/aftermovie-fenacom-2026-sem-falas.jpg",
+    title: "FENACOM 2026 — versão sem narração",
+    caption: "Florianópolis · Somente imagens e trilha",
+  },
+];
+
+const VERTICAL_VIDEO: EventVideo = {
+  src: "/videos/salao-do-imovel-2026.mp4",
+  poster: "/videos/salao-do-imovel-2026.jpg",
+  title: "Salão do Imóvel 2026",
+  caption: "Joinville · Cobertura do evento",
+  vertical: true,
+};
+
+/**
+ * preload="none" + poster: a página não baixa nenhum byte de vídeo até o
+ * usuário dar play. Cada arquivo tem ~45 MB, então isso é o que mantém o
+ * carregamento da página leve.
+ */
+function VideoCard({
+  video,
+  style,
+}: {
+  video: EventVideo;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <article
+      className="rounded-2xl overflow-hidden flex flex-col"
+      style={{
+        ...style,
+        backgroundColor: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.10)",
+      }}
+    >
+      <div
+        className="relative w-full"
+        style={{
+          aspectRatio: video.vertical ? "9 / 16" : "16 / 9",
+          backgroundColor: "#000",
+        }}
+      >
+        <video
+          controls
+          playsInline
+          preload="none"
+          poster={video.poster}
+          aria-label={video.title}
+          className="absolute inset-0 w-full h-full"
+          style={{ objectFit: "cover" }}
+        >
+          <source src={video.src} type="video/mp4" />
+          Seu navegador não suporta a reprodução de vídeo.
+        </video>
+      </div>
+
+      <div className="p-5">
+        <h3 className="text-base font-extrabold leading-tight mb-1.5 text-white">
+          {video.title}
+        </h3>
+        <p className="text-[12px]" style={{ color: "rgba(255,255,255,0.55)" }}>
+          {video.caption}
+        </p>
+      </div>
+    </article>
+  );
+}
+
 export function EventosClient({
   hero,
   featuredEvent,
@@ -110,6 +199,7 @@ export function EventosClient({
   const { ref: gridRef, inView: gridInView } = useInView(0.05);
   const { ref: calRef, inView: calInView } = useInView(0.1);
   const { ref: pastRef, inView: pastInView } = useInView(0.05);
+  const { ref: vidRef, inView: vidInView } = useInView(0.05);
 
   return (
     <ClientSiteChrome pageKey="eventos">
@@ -551,6 +641,64 @@ export function EventosClient({
             </div>
           </section>
         )}
+
+        {/* VÍDEOS */}
+        <section
+          className="relative py-20 overflow-hidden"
+          style={{
+            background: "linear-gradient(160deg, #002952 0%, #004a94 100%)",
+          }}
+        >
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+              backgroundSize: "64px 64px",
+            }}
+          />
+          <div className="relative z-10 max-w-7xl mx-auto px-6">
+            <div ref={vidRef} className="mb-10" style={fadeIn(vidInView)}>
+              <div className="flex items-center gap-3 mb-5">
+                <div
+                  className="w-10 h-[3px] rounded-full"
+                  style={{ backgroundColor: "#F6811E" }}
+                />
+                <span
+                  className="text-[11px] font-bold uppercase tracking-[0.25em]"
+                  style={{ color: "rgba(255,255,255,0.55)" }}
+                >
+                  <Film size={11} className="inline mr-1.5 align-[-1px]" />
+                  Vídeos
+                </span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight leading-tight text-white">
+                Reviva os eventos
+              </h2>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-5">
+              {EVENT_VIDEOS.map((v, i) => (
+                <VideoCard
+                  key={v.src}
+                  video={v}
+                  style={staggerStyle(vidInView, i, 0.05)}
+                />
+              ))}
+            </div>
+
+            {/* Vertical (9:16) fica em coluna estreita própria para não
+                esticar junto dos 16:9 acima. */}
+            <div className="mt-5 flex justify-center">
+              <div className="w-full max-w-[340px]">
+                <VideoCard
+                  video={VERTICAL_VIDEO}
+                  style={staggerStyle(vidInView, 2, 0.05)}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* CTA */}
         <section className="pb-24 bg-white pt-12">
